@@ -1,0 +1,12 @@
+#!/bin/sh
+# the_container pre-commit: both gates green or no commit.
+# Enable once per clone:  git config core.hooksPath utilities/hooks
+cd "$(git rev-parse --show-toplevel)" || exit 1
+
+python3 utilities/gate.py || exit 1
+
+if command -v lake >/dev/null 2>&1 || [ -x "$HOME/.elan/bin/lake" ]; then
+    PATH="$HOME/.elan/bin:$PATH" python3 utilities/adjudicate.py || exit 1
+else
+    echo "pre-commit: lake not found — adjudications gate skipped"
+fi
