@@ -17,6 +17,11 @@ Checks:
      the dangling-reference check.
   4. A code fence left open at end of file is red: an unclosed fence
      hides everything after it from this parser.
+  5. In a git repository, core.hooksPath must be set. Git never runs
+     hooks from a tracked directory, so a fresh clone has the
+     pre-commit hook file and does nothing with it — commits would
+     sail through ungated, silently. The gate detects its own
+     bypass. Skipped before git init, so the seed workflow is clean.
 
 Hazards this parser is built around, all paid for upstream: several
 files in this tree contain examples of themselves, so the notebook
@@ -26,6 +31,7 @@ after "## Threads". Patterns use [0-9]+ and matches are counted.
 import datetime
 import pathlib
 import re
+import subprocess
 import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
@@ -88,8 +94,31 @@ def parse_types(contract_text):
     return set()
 
 
+def hooks_bypass():
+    """Return a failure string when this is a git repo whose hooks
+    are silently inactive; None otherwise (including pre-git-init)."""
+    if not (ROOT / ".git").exists():
+        return None
+    try:
+        r = subprocess.run(["git", "-C", str(ROOT), "config",
+                            "core.hooksPath"],
+                           capture_output=True, text=True)
+    except FileNotFoundError:
+        return None
+    if r.returncode != 0 or not r.stdout.strip():
+        return ("git repository with core.hooksPath unset — git never "
+                "runs hooks from a tracked directory, so commits on this "
+                "clone are ungated; run: "
+                "git config core.hooksPath utilities/hooks")
+    return None
+
+
 def main():
     fails = []
+
+    bypass = hooks_bypass()
+    if bypass:
+        fails.append(bypass)
 
     contracts = [n for n in CONTRACT_NAMES
                  if (ROOT / n).is_file() and (ROOT / n).stat().st_size > 0]

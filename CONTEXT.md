@@ -101,7 +101,10 @@ fire both directions.
 
 Sample hook running both gates before every commit (adjudicate.py
 skipped with a notice when Lean is absent). Enabled per clone with
-`git config core.hooksPath utilities/hooks`.
+`git config core.hooksPath utilities/hooks` — git never activates
+tracked hooks on clone, so gate.py reds on any git clone where that
+config is unset (skipped before git init). break_tests.py is
+deliberately outside the hook; it runs by hand after gate changes.
 
 ### utilities/break_tests.py
 

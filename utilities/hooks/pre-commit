@@ -1,6 +1,16 @@
 #!/bin/sh
 # the_container pre-commit: both gates green or no commit.
+#
 # Enable once per clone:  git config core.hooksPath utilities/hooks
+# Git never runs hooks from a tracked directory, so cloning alone
+# activates nothing — gate.py goes red on a clone until this config
+# is set, precisely so the bypass cannot stay silent.
+#
+# What runs here: gate.py (instant) and adjudicate.py (~1 s once the
+# Lean toolchain has built; skipped with a notice when lake is
+# absent). What deliberately does not: break_tests.py — it copies
+# the tree and rebuilds Lean per scenario; run it by hand after any
+# change to the gates themselves.
 cd "$(git rev-parse --show-toplevel)" || exit 1
 
 python3 utilities/gate.py || exit 1

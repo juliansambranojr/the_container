@@ -87,9 +87,19 @@ python3 utilities/gate.py
 
 Checks that the commitment files exist and are non-empty, that
 notebook entries are sequentially numbered, dated, and typed from the
-declared vocabulary, and that every NOTEPAD thread line is well-formed
-and points at an entry that exists. Run it before every commit; wire
-it into a pre-commit hook once the project is a git repository.
+contract file's vocabulary, and that every NOTEPAD thread line is
+well-formed and points at an entry that exists.
+
+The pre-commit hook at `utilities/hooks/pre-commit` runs both gates
+on every commit (the adjudications gate takes about a second once
+Lean has built, and is skipped with a notice when Lean is absent).
+One thing git will never do for you: hooks in a tracked directory do
+not activate on clone. That is why quickstart step 6's
+`git config core.hooksPath utilities/hooks` exists — and why gate.py
+goes red on any clone where it hasn't been run: an ungated commit
+path is not allowed to stay silent. `utilities/break_tests.py` is
+deliberately outside the hook (it copies the tree and rebuilds Lean
+per scenario); run it by hand after any change to the gates.
 
 ## Model-agnostic by construction
 

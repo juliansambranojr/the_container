@@ -95,6 +95,18 @@ def main():
     expect("zero-line Threads section -> green", "gate.py",
            empty_threads, False)
 
+    def git_no_hookspath(t):
+        subprocess.run(["git", "init", "-q"], cwd=t, check=True)
+    expect("git repo, hooksPath unset -> red", "gate.py",
+           git_no_hookspath, True)
+
+    def git_with_hookspath(t):
+        subprocess.run(["git", "init", "-q"], cwd=t, check=True)
+        subprocess.run(["git", "config", "core.hooksPath",
+                        "utilities/hooks"], cwd=t, check=True)
+    expect("git repo, hooksPath set -> green", "gate.py",
+           git_with_hookspath, False)
+
     # -- adjudicate.py scenarios ------------------------------------
     def unimported_module(t):
         (t / "adjudications/Adjudications/Bogus.lean").write_text(
