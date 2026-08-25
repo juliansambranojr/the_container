@@ -126,3 +126,32 @@ container behaving as specified — the characteristic error is
 invisible to its author, and only decorrelated mechanism finds it.
 
 No outcome marked; transitions are the operator's.
+
+## Entry 4 — 2026-08-25 — instrument — the gate detects its own bypass
+
+**The hole.** Git never runs hooks from a tracked directory: a fresh
+clone carried `utilities/hooks/pre-commit` and did nothing with it,
+so every commit on that clone was ungated, silently, until the
+one-time `git config core.hooksPath utilities/hooks` was run. That
+knowledge lived in a quickstart step and a comment inside the hook
+file — prose, guarding the one path where prose is worthless. The
+operator asked whether the hooks were explicit; they were three
+scattered one-liners.
+
+**The repair, commit c7d6030.** The record gate now checks, whenever
+a `.git` directory exists, that `core.hooksPath` is set — red with
+the one-line fix in the message when it is unset, skipped entirely
+before git init so the § 7.2 seed workflow stays clean. A clone that
+skips the config now learns it on the first gate run. The hook
+header and the README also state the cost profile plainly: what runs
+on every commit (both gates, about a second once Lean is warm,
+adjudications skipped with a notice when Lean is absent) and what
+deliberately stays out (the break-test suite, which copies the tree
+and rebuilds Lean per scenario; it runs by hand after any change to
+the gates).
+
+**Verification.** Two new break scenarios: git repo with hooksPath
+unset fires red; with it set, green. Fifteen scenarios behave, zero
+skipped; both gates green on the intact tree.
+
+No outcome marked; transitions are the operator's.
