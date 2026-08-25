@@ -75,3 +75,54 @@ recorded and the operator accepts the ledger. The blueprint § 4.4
 gained the operator's rationing rule: the adversarial round is
 scheduled, never ambient — overuse re-prices the trajectory toward
 consensus caution.
+
+## Entry 3 — 2026-08-25 — audit — the adversarial review, and what it broke
+
+**The review.** Before ratchet zero, on the operator's instruction, a
+decorrelated reader was briefed with file paths only and told to
+break the repository: legibility for a stranger, and the build.
+It ran its own break-tests on scratch copies, attacked its own
+findings before reporting, retracted 5, and returned 12. Its summary
+line was the finding that mattered: the prose describing the gates
+was stronger than the gates — in a repository whose thesis is that
+prose confidence is worthless.
+
+**The sharpest findings.** Three ways to pass the adjudication gate
+falsely: a module never imported into the root file is never
+compiled, so a fabricated pin with a matching ledger certified
+GREEN; an unpinned theorem could smuggle any axiom past the ledger;
+and `sorryAx` sat in the core-axiom allowlist, so an unfinished
+proof, honestly pinned, passed. Beyond those: the record gate
+contradicted the blueprint twice (contract filename hardcoded, empty
+thread section rejected — following § 7's own instantiation steps
+produced a red gate), a one-character pointer typo silently defeated
+the dangling-reference check, an unclosed code fence hid everything
+after it, no license on a repository whose pitch is "copy this
+folder," and the quickstart left an adopter shipping the template's
+own state.
+
+**The repairs, all landed before ratchet zero.** The adjudication
+gate now requires import-closure membership, theorem/pin parity,
+declared-axiom coverage, and rejects `sorry` everywhere. The record
+gate accepts three contract filenames, allows an empty thread
+section, parses the type vocabulary from the contract file itself,
+and reds on unclosed fences and unpointed entry mentions. LICENSE
+(Apache-2.0), the keep/replace checklist, the elan pointer, and the
+pre-commit hook shipped. The review's break scenarios became the
+permanent regression suite — 13 scenarios, replayed on scratch
+copies, each required to fire; the gates now gate the gates.
+
+**Correction.** Entry 2 said the kernel checks "both halves" of the
+§ 1 thesis. Overstated: the kernel checks two theorems over the
+thesis's skeleton, and the positive half of the prose is stronger
+than `sound_overrules_somewhere`, which a reject-everything policy
+satisfies vacuously. The ledger stated this correctly; the entry's
+summary sentence inflated it. This entry is the correction.
+
+**What the audit demonstrated about the method.** The pin fired on
+its author during construction (entry 2); the review fired on the
+gates before they could certify anyone else. Both catches are the
+container behaving as specified — the characteristic error is
+invisible to its author, and only decorrelated mechanism finds it.
+
+No outcome marked; transitions are the operator's.
