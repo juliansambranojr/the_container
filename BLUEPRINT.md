@@ -5,6 +5,10 @@ tool-agnostic, evergreen. It was built once, under load, for a research
 program in analytic number theory; it is written down here so that any
 idea can move in.
 
+This is the second draft. The first is in git history; it was written
+after the container had worked, and this one is written after it broke,
+repeatedly, in a single week. § 12 records exactly what changed.
+
 ---
 
 ## 1 · Thesis
@@ -26,9 +30,9 @@ The container is that structure. Four load-bearing properties:
 3. **The powers are separated.** Generating, checking, adversarial
    reading, and deciding are held by different parties, because the
    generator's characteristic error is invisible to the generator.
-4. **Progress is a ratchet.** Every verified state is committed before
-   the next risk is taken, so ground gained is never lost — to a crash,
-   a context wipe, a bad afternoon, or a wrong turn.
+4. **Progress is a ratchet.** Every green state is committed before the
+   next risk is taken, so ground gained is never lost — to a crash, a
+   context wipe, a bad afternoon, or a wrong turn.
 
 Inside this container the generator can be pushed hard — fast,
 believing, ambitious — because velocity has stopped being the thing
@@ -36,67 +40,36 @@ that safeguards truth. The gates safeguard truth. Belief supplies the
 pressure; the gates supply the direction; the pairing is the engine.
 
 The inversion at the core: the default workflow is a generation engine
-with optional verification. The container is a verification engine
-with generation as its fuel.
+with optional verification. The container is a verification engine with
+generation as its fuel.
+
+### 1.1 · The correction that produced this draft
+
+The first draft assumed that a rule, written down in a place the
+generator reads, is a rule. It is not.
+
+The source program's governing documents contained the exhaustiveness
+rule — the one broken in § 5.1 — with a worked example, in the layer
+read at the start of every session. Two earlier protocols in the same
+directory had applied it correctly, days before. The defect happened
+anyway, in a protocol drafted by a generator with all of it available.
+
+**A rule that must be read to be obeyed will eventually not be read.**
+Under context pressure a generator regenerates structure from priors
+instead of loading it, and the regenerated version is fluent, plausible,
+and subtly wrong. That is `drift`, and no amount of writing prevents it.
+
+So the container's central design constraint is now:
+
+> Prefer a mechanism that **executes** over a mechanism that must be
+> **read**. When a rule can be made to run, make it run. When it cannot,
+> write it down — and expect it to fail sometimes.
+
+Sections 5 and 6 follow from that sentence.
 
 ---
 
-## 2 · Why — the failure modes each part answers
-
-Every part of the container exists because a specific failure occurred
-without it. The failures are properties of fluent generation itself,
-so they will recur in any domain.
-
-**Coherent-and-wrong.** The generator produces a reference, a value, a
-claim that reads correctly and is false — and nothing about the
-experience of producing it signals the error. *Answer: gates. A claim
-is checked by a mechanism that cannot be charmed.*
-
-**Self-judging.** Asked to evaluate its own output, a generator
-consults the same instincts that produced the output; an LLM judge
-parrots the preferences of its training. Agreement with yourself is
-the weakest evidence there is. *Answer: separation of powers, and an
-adversary decorrelated from the author.*
-
-**Consensus pricing.** The generator prices difficulty from the
-literature it absorbed — "that is known to be hard" — when difficulty
-is a property of the claim at the precision the consumer needs, and
-the consumer's tolerance is routinely 10–700× cruder than the
-literature's standard. Whole programs die at this mispricing. *Answer:
-measure the budget before pricing the scope.*
-
-**Flow cuts corners.** Deep in a productive run, the path looks so
-clear that steps get skipped — and the skipped step is where the
-defect sits. The pattern folds in on itself; attention needs outside
-contrast to stay sharp. *Answer: scheduled perturbation — the
-adversarial round fires precisely when a conclusion has survived its
-author's own review.*
-
-**Context evaporates.** Sessions end, windows compact, instances die,
-people forget. Work whose state lives in a head or a chat log loses
-ground at every boundary. *Answer: stigmergy — the state lives in the
-tree, and any fresh instance re-orients by reading files.*
-
-**Unlogged results.** A result that produced no dated entry does not
-exist a month later. The judgment of what deserves logging drifts if
-it is left to the generator's mood. *Answer: after anything a later
-reader would want dated, offering the log is mandatory; deciding is
-the operator's.*
-
-**Silent scope narrowing.** Given "check all of X," a generator checks
-most of X and reports done. Compressed scope is a decision taken away
-from the operator. *Answer: scope is part of the ask; narrowing
-requires asking first.*
-
-**Hedge-dressing.** Corrections smuggled inside new claims ("it is A,
-not B" — where B was the generator's own earlier assertion), and
-disclaimers appended after deliveries they could not have informed.
-Both read as rigor while hiding a retraction. *Answer: say what is;
-corrections stand as their own plainly-visible sentences.*
-
----
-
-## 3 · Definitions
+## 2 · Definitions
 
 **Operator.** The human owner of the work. Holds synthesis, verdicts,
 scope, and every outward-facing action.
@@ -105,68 +78,76 @@ scope, and every outward-facing action.
 whose output rate exceeds their verification rate. Interchangeable by
 design: if the generator is swapped, the container still works.
 
-**Gate.** A mechanical check that can fail: a compiler, a proof
-kernel, a test suite, a reference checker, a value checker, a locked
-decision rule. Gates fire in both directions — a gate that can only
-pass is decoration.
+**Gate.** A mechanical check that can fail: a compiler, a proof kernel,
+a test suite, a reference checker, a value checker, a decision rule's
+partition assertion. Gates fire in both directions — a gate that can
+only pass is decoration.
 
 **Green state.** The condition in which every gate passes. The unit of
 progress; the only state worth committing.
 
-**Ratchet commit.** A commit of a green state, made before the next
-risk is taken. The sequence of ratchet commits is a floor that only
-rises.
+**Ratchet commit.** A commit of a green state, made before the next risk
+is taken. The sequence of ratchet commits is a floor that only rises.
 
-**Commitment files.** The small set of files that carry the working
+**Commitment files.** The small set of files carrying the working
 contract: identity and rules; the current state of the world; the
-references; the index of open threads. Reading them is how any
-instance — fresh, resumed, or replaced — recovers full orientation.
+references; the index of open threads. Reading them is how any instance
+— fresh, resumed, or replaced — recovers orientation.
 
-**Record (notebook).** The append-only, dated log of what happened:
-runs, results, corrections, decisions. Entries are appended by anyone;
-outcome markings and status transitions belong to the operator.
+**Record (notebook).** The append-only, dated log of what happened.
+Entries are appended by anyone; outcome markings and status transitions
+belong to the operator.
 
-**Index.** A greppable one-line-per-thread pointer into the record,
-each line carrying a status. The cheapest possible map of what is
-open.
+**Index.** A greppable one-line-per-thread pointer into the record, each
+line carrying a status.
 
-**Leaf.** A named open assumption the current work stands on. Every
-leaf carries two things at birth: a budget and a discharge sketch.
+**Leaf.** A named open assumption the current work stands on. Every leaf
+carries two things at birth: a budget and a discharge sketch.
 
 **Budget.** The measured tolerance of the downstream consumer: how
-wrong, how crude, how large can this piece be before the thing that
-uses it stops working? Measured by running the consumer, never
-estimated from prestige.
+wrong, how crude, how large can this piece be before the thing that uses
+it stops working? Measured by running the consumer, never estimated from
+prestige.
 
 **Discharge sketch.** A concrete sketch of how a leaf would ever be
-proved or verified, produced the moment the leaf is named. A leaf
-whose discharge cannot be sketched is usually a defect in the leaf —
-and this is the cheapest place to find it.
+proved or verified, produced the moment the leaf is named. A leaf whose
+discharge cannot be sketched is usually a defect in the leaf — and this
+is the cheapest place to find it.
 
-**Consensus price.** The difficulty a task inherits from its
-reputation. A consensus price is an echo; a budget is a measurement.
+**Consensus price.** The difficulty a task inherits from its reputation.
+A consensus price is an echo; a budget is a measurement.
 
 **Slice.** A unit of work no larger than one green build. Slicing is
 what makes belief safe.
 
 **Prereg (locked protocol).** For empirical claims: the test written
-before the run — parameters locked, a decision rule that can fire in
-both directions, results hashed against a sidecar. Output produced
-under a locked prereg can carry a verdict; everything else is
+before the run — parameters locked, a decision rule implemented as a
+predicate table (§ 5.1), results hashed against a sidecar. Output
+produced under a locked prereg can carry a verdict; everything else is
 exploratory and is labelled so.
 
-**Verdict.** The operator's recorded judgment on a preregistered
-result. Generators may report what the decision rule mechanically
-returned; the verdict line is the operator's to write.
+**Predicate table.** A decision rule expressed as `(label, predicate)`
+pairs in executable code, with an assertion that exactly one fires.
+
+**Residue branch.** The one label whose predicate is unconditionally
+true — it owns every outcome the others do not. Not a failure label; it
+routes to a stated next step.
+
+**Verdict.** The operator's recorded judgment on a preregistered result.
+Generators report what the decision rule mechanically returned; the
+verdict line is the operator's to write.
+
+**Blind arm.** The part of the data nobody has looked at, stated as a
+mechanism rather than an assurance (§ 5.3).
 
 **Perturbation.** A deliberately decorrelated pass — an adversarial
-reader with no stake in the author's framing, briefed from files
-rather than from the author's summary. Scheduled by the operator,
-especially at the moments the work feels most obviously right.
+reader with no stake in the author's framing, briefed from files rather
+than from the author's summary. Scheduled by the operator, especially at
+the moments the work feels most obviously right.
 
 **Stigmergy.** Coordination through the shared artifact rather than
-through memory: each actor reads the tree, acts, and writes back to
-the tree, so the environment itself carries the plan.
+through memory: each actor reads the tree, acts, and writes back to the
+tree, so the environment itself carries the plan.
 
 **Drift.** Generating from priors and recency while believing you are
 generating from the sources. The symptom: hours of iteration arriving
@@ -174,296 +155,390 @@ back at what the documents already said.
 
 ---
 
+## 3 · Why — the failure modes each part answers
+
+| failure mode | what it looks like | the part that answers it |
+|---|---|---|
+| confident error | wrong output indistinguishable from right | gates |
+| drift | regenerating structure from priors | commitment files, read not recalled |
+| context loss | the thread dies with the window | record + ratchet commits |
+| self-agreement | a conclusion reviewed by its author | perturbation |
+| rationalized result | the rule bent to fit the data | prereg, fixed before the run |
+| unanswerable outcome | a result no label covers | predicate table + residue branch |
+| manufactured signal | the pipeline producing its own finding | null through the identical pipeline |
+| consensus pricing | "that's out of scope" without measurement | budget |
+| silent clobber | a re-run destroying its predecessor | invocation-layer interception |
+| unverifiable provenance | an artifact with no invocation behind it | manifests |
+
+---
+
 ## 4 · The parts
 
-### 4.1 The substrate — state in the tree
+| part | holds | fails loudly when |
+|---|---|---|
+| commitment files | the working contract | orientation is taken from a summary |
+| record | dated entries, one per event | an entry cites something nonexistent |
+| index | one line per open thread | a thread goes stale unreviewed |
+| preregs | fixed-before-run protocols + sidecars | a hash does not match its text |
+| gates | executable checks | a claim enters unchecked |
+| artifacts | run outputs, immutable | a run overwrites a prior one |
+| manifests | what invoked what, with hashes | an artifact has no invocation behind it |
+| adjudications | claims verified outside the system | an internal-only check is called sound |
 
-A flat directory of plain-text files under version control. Four
-commitment files at the root:
+Nothing here is domain-specific. The record is markdown, the gates are
+scripts, the artifacts are whatever the work produces.
 
-```text
-CLAUDE.md      identity, rules, permissions — the working contract
-               (name the file for whatever generator you use;
-               the contract is what matters)
-CONTEXT.md     the blueprint of the work: what exists, what each
-               piece does, the current state of the world
-REFERENCES.md  every cited document, dependency, and constant,
-               with paths
-NOTEPAD.md     the index: one status-tagged line per open thread,
-               pointing into the notebook by entry number
+---
+
+## 5 · The scaffold
+
+Each item below exists because it failed. The citations are to runs, not
+to opinions.
+
+### 5.1 · Decision rules execute; they do not persuade
+
+A prereg's decision rule is a list of `(label, predicate)` implemented
+**in the script the prereg names**, and the run asserts that **exactly
+one predicate fires**.
+
+```
+labels = [
+    ("compromised",  lambda r: <integrity conditions>),
+    ("supported",    lambda r: <H1 conditions>),
+    ("refuted",      lambda r: <H0 conditions>),
+    ("inconclusive", lambda r: True),          # the residue branch
+]
+fired = [name for name, p in labels if p(result)]
+assert len(fired) == 1, f"RULE DOES NOT PARTITION: {fired}"
 ```
 
-Alongside them: the notebook (`lab_notebook.md`), the artifacts
-(results, papers, proofs, code), and the gates (`utilities/`).
+**Why.** A prereg whose rule lived only as prose was evaluated by hand
+and returned a plausible label. A perturbation later found the observed
+configuration matched *no* branch: one label failed on its second
+clause, the next failed on both of its clauses, and only a fourth
+label's silent gate caught the run. Move the measurement 25% in the
+direction it was already moving, and no label in the protocol would have
+applied. Three days and two further runs passed without anyone noticing,
+because English does not assert.
 
-Two disciplines keep the substrate load-bearing. **Orient on entry:**
-any instance, on arrival or after any context loss, reads the
-commitment files before doing substantive work — prior summaries are
-never trusted alone. **Ratchet before loss:** before any planned
-context boundary, the commitment files are brought to current truth
-and the tree is committed and pushed. The remote copy is the durable
-fallback; if memory is forfeit, the freshly-synced commit is what the
-next instance reads.
+Prose rules also cannot be checked for exhaustiveness by any tool. A
+text checker for "the final rule must be unconditional" was prototyped
+against nine real preregs: **1 true positive, 1 false positive,
+undefined on 4**. It cannot distinguish "no case clears the threshold"
+— a legitimate residue phrased positively — from "the gate failed." The
+predicate table makes the question decidable because the assertion runs.
 
-### 4.2 The gates
+### 5.2 · Power is measured before the prereg is locked
 
-Every domain gets the strongest gate it admits (§ 8 maps common
-domains). Whatever the gate, three rules hold:
+Before locking, simulate. Plant the effect at several sizes, plant its
+absence, push both through the identical pipeline, report the rate at
+which each is labelled correctly.
 
-- A claim enters the record only through a gate. Output produced
-  outside the gates is exploratory and is labelled so.
-- Gates are mechanical. A gate that requires judgment to interpret has
-  the judgment moved into it (a locked threshold, a pinned expected
-  output) or is demoted to advice.
-- When a gate is red, the state is red. There is no "basically green."
+Three outcomes, all useful: the design has power and is worth locking;
+the design has no power at the available data size, and the honest
+deliverable is the size at which it would; or the statistic is
+degenerate — returning the same value under both plants — which kills
+the design before it costs a prereg.
 
-### 4.3 The ledger of leaves
+In the source program this killed one design outright, sized a second
+that then worked, and twice identified *which variant* of a statistic
+was constant by construction, so the informative variant got locked.
 
-The work at any moment stands on a short, explicit list of named open
-assumptions. Each carries its budget (measured) and its discharge
-sketch (written at naming time). The ledger is small on purpose: if it
-grows, the work has outrun its verification and the next slices are
-discharges. Twice-proven pattern: sketching the discharge of a
-freshly-named leaf exposes that the leaf, as stated, is unsatisfiable
-— the cheapest possible time to learn it.
+### 5.3 · The blind arm is a mechanism, not an assurance
 
-### 4.4 The adversarial round
+"We have not looked" is unverifiable and, from a generator, worthless.
+State it as something checkable:
 
-A second reader, decorrelated from the author: fresh context, briefed
-by file paths rather than by the author's summary, instructed to
-break the thing. Fired at three moments — when a scope call says
-"impossible," when an audit conclusion survives the author's own
-review, and before anything outward-facing ships. Two-round form for
-big claims: one round to break the proposal, a separate round to break
-the repair. The retraction rate of the adversary's own findings is
-part of the signal; an adversary that retracts none of its findings
-was not pushed to attack itself.
+- the code drops the values before any statistic is computed;
+- the analysis mode refuses to run without an explicit confirmation
+  flag, and the refusal is exercised;
+- the design work computed no value at any measured site, and the commit
+  history shows it.
 
-The round is scheduled, never ambient: an adversary run on everything
-re-prices the trajectory toward consensus caution — the same drift
-§ 2 names, entering from the other side. It refines; the operator
-rations it.
+### 5.4 · Nulls carry the instrument, including its transfer function
 
-### 4.5 The ratchet
+A null must pass through the **identical** pipeline as the observation.
+That is standard and insufficient.
 
-Slice → green → commit → next risk. Commits are small, frequent, and
-always of green states. Corrections are logged plainly where they are
-visible as corrections. The floor never goes down.
+**The pipeline's own shape must be in the null.** An instrument that
+differences consecutive blocks imposes a gain suppressing low
+frequencies; a null placing outcomes uniformly across the full band
+models a freedom the instrument does not have and reports significance
+that is partly geometry. Here that inflated a p-value roughly fourfold,
+and a perturbation found it, not the pipeline.
 
----
+Two rules follow. A null must be describable as *what it preserves and
+what it destroys* — if that sentence cannot be written, the null is not
+understood. And validate a proposed null by pushing structureless input
+through it: if it returns "significant" on noise, it is manufacturing
+the finding. That check has fired here twice, once turning
+Poisson-placed input into a statistic sitting on the celebrated value it
+was being compared against.
 
-## 5 · The workflow — one loop
+### 5.5 · Comparisons need their comparison sets audited
 
-```text
-0. ORIENT     read the commitment files; trust nothing remembered
-1. PRICE      before scoping, measure the budget: how crude can this
-              be before the downstream consumer breaks?
-2. SLICE      cut the work into pieces no larger than one green build
-3. GROUND     read the source before writing the claim; cite it or
-              do not claim it
-4. GENERATE   build the slice
-5. GATE       run every check; red means stop and fix
-6. LOG        offer the entry; the operator decides; date everything
-7. RATCHET    commit the green state; push
-8. PERTURB    when a conclusion survives your own review, spawn the
-              adversary; repair; gate again
-9. REPEAT     next slice — or, at any context boundary, ratchet the
-              commitment files and re-enter at 0
-```
+When a statistic ranks one target against others, verify the comparison
+set is not contaminated by something unrelated to the hypothesis.
 
-Notes on the loop:
+Here, one target's strongest "control" sat within a resolution element
+of a genuine feature — so that target was asked to out-read real signal
+while its rivals were compared against quiet regions. Cleaning the sets
+inverted the ordering the conclusion rested on.
 
-- Step 1 is where most "impossible" work becomes possible. Run the
-  consumer at deliberately degraded inputs and find where it breaks;
-  the distance between that break point and the literature's standard
-  is the room you have.
-- Step 3 has a hard trigger list: any foundational question — "is X
-  the right tool," "what does the spec say," "what is the deliverable"
-  — blocks generation until the source is open. A reference that could
-  have been different last week is opened, never recalled.
-- Step 6 exists because the record is part of the work. "That's a
-  result — log it?" costs one line; the missing dated entry costs the
-  history.
-- Step 8 is scheduled by the operator, and the trigger is confidence
-  itself: the moment the path looks clearest is the moment the
-  adversary earns its keep.
+Also ask whether the coordinate system privileges one target by
+construction. There, the sampling lattice was *defined from* the first
+target, placing it at rational points of every sub-instrument while
+rivals sat at generic points. Dropping one sub-instrument moved two
+targets by +15% and −16% and flipped the ranking.
 
----
+### 5.6 · Extrapolations name their branch, their points, and their independence
 
-## 6 · The roles — separation of powers
+An extrapolation states how many points it rests on, whether those
+points are independent, which model produced it, and the interval.
 
-Four powers, four holders. Collapsing any two recreates a failure
-mode from § 2.
+A two-point extrapolation was published here as "roughly 2^52." The
+points were **nested** — 89% of the second was the first — the observed
+gain sat one standard deviation above the trivial floor, and the implied
+exponent interval spanned `[−0.46, 1.55]`. Under the other branch of the
+same paragraph the answer was past 2^64. The honest form names both
+branches, or says the slope is unmeasured.
 
-**The generator generates.** Fast, believing, inside the rules. It
-appends entries, opens index lines, reports what decision rules
-mechanically returned. Where the work is finite and inside known
-rules, it decides and executes; escalation is reserved for genuine
-synthesis moments.
+### 5.7 · A gate's displayed verdict derives from its displayed numbers
 
-**The gates judge validity.** Mechanically, incorruptibly, without
-fatigue. What the kernel or the test suite accepts is valid; meaning
-is a separate question and belongs to the parties below.
+A gate printed `PASS ... union 224 (design 199)` — a pass label beside
+the numbers contradicting it — because its flag short-circuited to true
+whenever the configuration was off-design.
 
-**The adversary judges the framing.** It attacks the author's model
-of the work — the part gates cannot see, because gates only check
-what was stated, and the characteristic defect is in what was stated.
+Two consequences. A gate that does not apply prints `N/A` with the
+reason, never `PASS`. And any boolean the record reports carries the
+margin that decided it: a "dominates" flag separating values by 1e-7 is
+float jitter wearing a verdict's clothes.
 
-**The operator judges meaning.** Synthesis, verdicts, status
-transitions, scope changes, and every outward-facing action —
-publishing, posting, flipping visibility — happen on the operator's
-explicit word, at that moment. The operator also supplies belief:
-"it's possible — let's go" is an instruction to measure and slice,
-and the operator's willingness to say it against consensus pricing is
-half the engine.
+### 5.8 · Check version control before building a mitigation
 
----
+An artifact recorded the hash of the script that produced it; the script
+was later edited; the mismatch was read as a provenance loss and an
+elaborate reproduction check was built to mitigate it. The original
+bytes were in git the whole time, at a commit the record already cited.
+One command settled it.
 
-## 7 · The starting kit — when to move in, and how
+General form: before building a mitigation, establish that the thing
+being mitigated is actually lost.
 
-### 7.1 When to move in
+### 5.9 · Read the whole table
 
-Exploration precedes the container. The idea, the sketches, the first
-wild claims — those happen in chat, on walks, in whatever medium
-generates best, and a container built during that phase adjudicates
-claims that do not exist yet. Gates on brainstorming kill the
-generativity, the same way an ambient adversary re-prices a
-trajectory toward caution (§ 4.4).
+A maximum was reported from a six-row view of a seventeen-row table. The
+number was wrong by a factor of 2.3 and stood for four entries before a
+perturbation caught it.
 
-The entry criterion: **the container becomes useful at the first
-claim you would mind losing.** Concrete signs the moment has come:
-
-- you catch yourself repeating a claim as if it were established;
-- you are building B on top of claim A;
-- you are about to tell someone;
-- you can no longer reconstruct why you believed something last week
-  — state has to leave your head now.
-
-The check then runs inward before outward. Inward is the argument
-layer: do the premises cohere, is the assumption set satisfiable,
-what does the conclusion actually stand on (§ 8's adjudication gate).
-Outward is the world layer: budgets, preregistered measurements,
-evidence. An idea that has passed neither is exploration; label it
-so and enjoy it.
-
-### 7.2 The seed — the minimum instantiation
-
-Four things, roughly twenty minutes:
-
-1. A git repository. That is the ratchet; without it nothing else
-   survives.
-2. One notebook file whose entry 1 answers three questions: what is
-   the idea; what does it stand on (the leaves, each with one line on
-   how it would ever be checked); what is the smallest artifact that
-   would prove it wrong.
-3. The falsifying-artifact question is the day-one gate. A script
-   comes later, when there is something mechanical to check.
-4. The commit habit: green, commit, next risk.
-
-Everything else grows on demand, each piece arriving when its absence
-first hurts. CONTEXT, REFERENCES, and NOTEPAD start as three sections
-of the notebook and split into files when they get too big to skim.
-The contract file joins the day a generator does — it is the contract
-with the generator, and a solo explorer needs no contract with
-themselves yet. The adjudication layer joins when an argument gets
-long enough that its validity can no longer be held by eye.
-
-### 7.3 The full kit
-
-Under an hour, any domain:
-
-1. `mkdir` the project; `git init`; add a remote.
-2. Write the four commitment files. CLAUDE.md (or AGENT.md, or
-   CONTRACT.md) carries the rules from this blueprint plus your
-   domain's specifics; CONTEXT.md starts nearly empty and grows one
-   entry per artifact; REFERENCES.md lists what you already cite;
-   NOTEPAD.md starts with its format comment and zero lines.
-3. Create `lab_notebook.md` with a dated entry 1: what this project
-   is, and what the smallest artifact is that would falsify its
-   central claim. If you cannot name that artifact, that is the first
-   open thread.
-4. Build one gate — the strongest your domain admits — and a script
-   that runs it. Wire it to run before every commit.
-5. Name your leaves: every assumption the idea stands on. Give each
-   its budget (measure it — build the crudest version and see if the
-   idea survives) and its discharge sketch (write, today, how it
-   would ever be verified).
-6. Start the loop at step 1.
-
-The kit is deliberately poor: files, git, one checker. Anything
-fancier is convenience, and convenience must never become the system
-of record. The test of the substrate: swap the generator entirely —
-different model, different person — and the workflow keeps working
-from the tree alone.
+Slicing a result and reporting an extremum of the slice is a distinct,
+recurring failure. Count the rows before trusting an extremum — and note
+this one happens in throwaway invocations, outside any file a linter
+scans, which is why § 6 intercepts it where it occurs.
 
 ---
 
-## 8 · Adapting the gates by domain
+## 6 · Gates: what earns a place
 
-The container is invariant; only the gates change. The question in
-every domain is the same: *what is the strongest mechanical check this
-kind of claim admits?*
+**A proposed gate is prototyped against the real corpus and scored
+before adoption.** Precision and coverage, measured, on the actual
+files. Not optional, and cheap.
 
-```text
-formal math        proof kernel (Lean, Coq, Isabelle); axiom pins so
-                   a proof that starts assuming more fails the build
-software           compiler + test suite + CI; the regression test IS
-                   the notebook entry's teeth
-empirical claims   prereg with locked parameters, a decision rule
-                   that can fire both ways, hashed result artifacts
-data analysis      pinned inputs (checksums), deterministic reruns,
-                   a sanity gate against a known-exact case
-writing/argument   reference checker (every citation resolves and is
-                   opened), value checker (every number traces to an
-                   artifact), the falsifying-artifact question
-design/craft       a locked acceptance checklist written before the
-                   build; a second decorrelated reviewer against it
-strategy/decisions the discharge sketch itself: state what evidence
-                   would change the call, and the date to re-check
-```
+The evidence is eight checks proposed here after a bad week — all
+plausible, six dead on contact with the corpus:
 
-Where a domain seems to admit no gate, the leaf ledger is the gate:
-force every claim to name what it stands on, budget it, and sketch its
-discharge. A field with no mechanical checks still has satisfiability
-— and unsatisfiable assumptions are found by sketching, in any field.
+| proposed check | measured |
+|---|---|
+| final rule must be unconditional | 1 true positive, 1 false positive, undefined on 4 of 9 |
+| rule thresholds appear in the locked table | fired on 8 of 9 — passing only the broken file |
+| labels agree across sections | 8 fires, 0 true positives, impossible by construction |
+| required sections present | 3 fires, all false, one on the reference exemplar |
+| verdict authored by a human | unimplementable — every commit has one author |
+| sliced-extremum source linter | 7 hits, 0 the defect; the defect never entered the repo |
+| short-circuit gate linter | 0 hits; the real defect is an `or` in an assignment |
+| sidecar verified at its locking commit | the only one that found something real |
 
----
+A gate's cost is paid on every invocation, forever. That prototype would
+have emitted ~1000 tokens per edit at a ~90% false-positive rate —
+roughly 55k tokens of noise per working session, on machinery whose
+entire value is silence when nothing is wrong. **A noisy gate gets
+baselined into inertness, which is worse than no gate**, because it
+leaves the appearance of coverage.
 
-## 9 · What the container refuses
+Three survived scoring, and are the recommended starting set:
 
-- **Verification by vibe.** "It looks right" enters nothing into the
-  record.
-- **The generator as judge of its own work.** Ever. The adversary is
-  briefed from files, never from the author's summary.
-- **Consensus pricing without a budget run.** "Too hard" is accepted
-  only with the measurement attached.
-- **Big-bang slices.** A slice that cannot reach green in one sitting
-  is two slices.
-- **Silent corrections.** A walked-back claim gets its own sentence,
-  dated, visible as a correction.
-- **Scope compression.** "All" means all; narrowing is asked for,
-  never assumed.
-- **Memory as a system of record.** Anything load-bearing that exists
-  only in a head, a chat log, or a model's memory is already lost.
-- **Outward actions on standing permission.** Publishing, posting,
-  and visibility changes take the operator's explicit word at that
-  moment.
-- **Verdicts from anyone but the operator.** Mechanical outputs are
-  reported; verdicts are written by the human whose name is on the
-  work.
+1. **Flag-from-or-chain.** One grep: a boolean reporting a check's
+   verdict must not be assigned from a short-circuiting `or`. Measured:
+   1 hit, the real defect, 0 false positives.
+2. **Numbers-in-prose.** Every number stated in the record appears in
+   the artifact its source line names, within rounding. Extend an
+   existing checker's scan set to cover the record and the preregs
+   rather than building a second checker. Measured: this would have
+   caught § 5.9's error four entries before a human did.
+3. **Throwaway-invocation warning.** When an ad-hoc command both reads
+   a result artifact and slices it, warn. Catches § 5.9 where it
+   happens.
+
+Behind all three: **intercept at the invocation layer, not at the call
+sites.** One implementation covers every script including the ones
+nobody has touched — the alternative here was seventy-five edits across
+three call-site shapes, each owing a re-run.
 
 ---
 
-## 10 · Provenance
+## 7 · The powers, separated
 
-This container was built and stress-tested in Primebeat_081426
-(<https://github.com/juliansambranojr/Primebeat_081426>), where it
-carried a measurement bench and a Lean 4 formalization program —
-including a day on which the same generator priced a theorem "months,
-minimum" at breakfast and delivered its first half, kernel-checked,
-by midnight. The delta was zero capability and one method: the budget
-was measured, the work was sliced, the adversary was scheduled, and
-the floor only rose. The notebook there is part of the publication;
-it shows the container operating, corrections included.
+Four roles. One party may hold several, but never *generate* and
+*adjudicate* the same claim.
+
+**Generator.** Produces work, at speed, believing it.
+
+**Gates.** Mechanical, automatic, no discretion, no appeals except by
+fixing the thing in the open.
+
+**Perturbation.** Reads to break. Three findings from running this hard:
+
+- *Spawn it when you agree with yourself.* A conclusion that survives
+  its own author's review is the least-tested kind.
+- *It must attack the concession too.* When a generator is challenged
+  and concedes, the concession is a claim produced in one move, aimed at
+  the challenger. Here a generator conceded within a single message and
+  two of its four stated grounds were falsified by entries it had
+  written the previous day. Agreeing quickly with whoever pushed is the
+  same defect as agreeing with yourself, and harder to see because it
+  looks like rigor.
+- *One that measures beats one that argues.* The strongest audit
+  produced here prototyped every proposed check against the real corpus
+  and scored it; six of eight died on the numbers. A report reasoning
+  about a check is worth less than one that runs it.
+
+**Operator.** Owns verdicts, status transitions, scope, and every
+outward-facing action. The generator computes the mechanical output and
+recommends; it does not stamp.
+
+---
+
+## 8 · The loop
+
+1. **Orient.** Read the commitment files. Not a summary of them.
+2. **Scope, audited.** One party proposes; a second, with no stake,
+   audits and returns a recommendation; the operator approves. Both
+   instruments built this way here caught a fatal flaw *before* code
+   was written — one a formula index that would have measured the wrong
+   objects and reported them under the right names.
+3. **Power first.** § 5.2.
+4. **Lock.** Predicate table in the script; hash the text; commit the
+   locked text *before* running (§ 9's corollary); state the blind arm
+   mechanically.
+5. **Run through the invocation layer**, so the artifact carries a
+   manifest and the prior version is archived.
+6. **Report the mechanical output.** Not the verdict.
+7. **Perturb.** § 7.
+8. **Record.** Run and reading as separate entries: what happened, then
+   what it means. Corrections go in new entries, visible as corrections,
+   never by editing the old one.
+9. **Ratchet.** Gates green, commit, push.
+
+---
+
+## 9 · Where things live
+
+Three layers, in order of authority. **Anything load-bearing lives in
+layer 1**, because 2 and 3 do not survive a change of tool.
+
+1. **Plain files in the work tree** — rules, preregs, record, gates.
+   Readable and runnable by anything. The system of record.
+2. **Tool-specific configuration** — hooks, settings. Convenience that
+   enforces layer 1.
+3. **Assistant-specific accelerators** — skills, memory. Forfeit on a
+   swap; may point at layer 1, must never be its only home.
+
+A proposal here failed this test by putting work-tree paths into an
+assistant skill *and* duplicating the discipline into a new tree
+document. Two homes, no rule for which wins, guaranteed drift. Before
+writing a new governing document, check whether the authoritative home
+already exists — usually the spec you are about to duplicate, plus the
+dated entry that taught the lesson.
+
+**Corollary, learned expensively.** A prereg's hash must stay verifiable
+after the fact. If the text is mutated after locking — to fill a run
+record — the sidecar pins text that then exists nowhere, unless the
+locking commit was made *before* the mutation. Eight of nine preregs in
+the source program have no recoverable pre-image for exactly this
+reason. Lock, commit, *then* run.
+
+---
+
+## 10 · Starting kit
+
+The minimum that is still a container:
+
+- a record file, dated entries, append-only;
+- an index of open threads, one line each;
+- one gate that can fail, wired to run automatically;
+- a prereg with a predicate-table rule, for the first claim that
+  matters;
+- version control, committed at every green state.
+
+A morning of work. Everything else here is what you add when a specific
+failure teaches you to — and the order in which failures arrive is the
+order in which to add.
+
+**Move in when** a wrong claim would cost more than the gates cost, and
+the work outlives one sitting. **Do not move in** for a one-afternoon
+question with no downstream consumer.
+
+---
+
+## 11 · What the container refuses
+
+- **A verdict from the generator.** It computes, recommends, stops.
+- **A gate with an appeals process.** Fix the thing or fix the gate, in
+  the open.
+- **A claim whose provenance is a summary.** Open the source.
+- **A correction folded into the original.** New entry, visible.
+- **A rule left in prose when it could execute.**
+- **A check adopted because it sounds right.** Score it first.
+- **A negative asserted without measurement.** "That says nothing about
+  X" is a claim, and it needs the same evidence as any other.
+
+---
+
+## 12 · What changed from the first draft
+
+The first draft was written after the container had worked. This one
+after it broke, several times, in one week.
+
+**Added:** § 1.1 (documentation's track record, and the
+execute-over-read constraint that follows); § 5.1 (executable decision
+rules and the residue branch); § 5.4's transfer-function requirement;
+§§ 5.5–5.9 (comparison contamination, extrapolation honesty, gates that
+contradict their own numbers, git-before-mitigation, whole-table reads);
+§ 6 entire (scoring a gate before adopting it, with the eight-check
+table and the token arithmetic); § 7's findings on concessions and on
+measuring adversaries; § 9's corollary on hash pre-images; § 11's last
+refusal.
+
+**Unchanged:** the thesis, the four properties, the vocabulary, the
+separation of powers, the ratchet. Those held under every load applied.
+
+---
+
+## 13 · Provenance
+
+Built and stress-tested in Primebeat_081426
+(<https://github.com/juliansambranojr/Primebeat_081426>), a measurement
+bench and Lean 4 formalization program. Its record is public, including
+the corrections — which is the point: the notebook shows the container
+operating, failing, and being repaired. A container whose record shows
+no failures is a container nobody ran hard.
+
+Two things there are load-bearing for this document. The dated
+correction entries are the empirical witness discharging the single
+premise of this repository's own adjudication — *some claim feels right
+and is incorrect* — so the argument here does not rest on assertion. And
+the week that produced this draft is itself the evidence for § 6: a
+generator proposed eight sensible-sounding gates, a perturbation ran
+them against the real corpus, and six died.
 
 The method is the container. The ideas are yours.

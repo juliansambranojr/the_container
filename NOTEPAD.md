@@ -7,6 +7,7 @@ generator; status transitions ([open] → [paused] / [closed] /
 Format (strict, for grep):
 
 ```text
+- [open]   2026-08-27  entry 5: build the three gates § 6 scored and kept — flag-from-or-chain, numbers-in-prose over the record, throwaway-invocation warning; blueprint recommends them, container does not yet implement them
 - [STATUS] YYYY-MM-DD  entry N: terse one-line description
 ```
 
@@ -27,3 +28,4 @@ grep 'entry 1'                   # all lines pointing at entry 1
 
 - [open]   2026-08-25  entry 2: run adjudication 001's back-translation round — decorrelated reader, module path only, diff against the quoted claim
 - [open]   2026-08-25  entry 1: discharge the domain-agnostic leaf — instantiate the container on one project outside formal research
+

@@ -155,3 +155,62 @@ unset fires red; with it set, green. Fifteen scenarios behave, zero
 skipped; both gates green on the intact tree.
 
 No outcome marked; transitions are the operator's.
+
+---
+
+## Entry 5 — 2026-08-27 — setup — BLUEPRINT second draft: execute over read
+
+**What changed.** `BLUEPRINT.md` rewritten from 469 to 544 lines. The
+first draft was written after the container had worked; this one after
+it broke repeatedly in one week of hard use in Primebeat_081426. The
+first draft is in git history at `367abac`.
+
+**The finding that forced it.** The source program's governing
+documents already contained the exhaustiveness rule that a prereg then
+violated — with a worked example, in the layer read at the start of
+every session, and with two earlier preregs in the same directory
+applying it correctly days before. The defect happened anyway, drafted
+by a generator that had all of it available.
+
+So the first draft's implicit assumption — that a rule written where
+the generator reads is a rule — is false. Under context pressure a
+generator regenerates structure from priors rather than loading it, and
+the regenerated version is fluent and subtly wrong. That is `drift`,
+and prose does not prevent it. The new § 1.1 states the constraint that
+follows: **prefer a mechanism that executes over one that must be
+read**, and §§ 5 and 6 are derived from it.
+
+**What is new.** § 5.1 makes a decision rule a predicate table in code
+with an exactly-one-fires assertion, and names the residue branch —
+because a prose rule was evaluated by hand, returned a plausible label,
+and a perturbation later found the observed configuration matched no
+branch at all. § 5.4 adds that a null must carry the pipeline's own
+transfer function, not merely pass through the pipeline. §§ 5.5–5.9 add
+comparison-set contamination, extrapolation honesty, gates whose
+displayed verdict contradicts their displayed numbers,
+git-before-mitigation, and whole-table reads. § 7 records that a
+perturbation must attack the *concession* as well as the claim. § 9
+gains the corollary that a prereg must be committed before it is run,
+or its hash pins text that exists nowhere.
+
+**§ 6 is the section with teeth, and it is empirical.** After the bad
+week the generator proposed eight gates, all plausible. A perturbation
+prototyped each against the real nine-prereg corpus and scored it: six
+died. The table is in the blueprint with the measured numbers, and the
+rule it establishes is that **a proposed gate is scored against the
+real corpus before adoption** — with the token arithmetic showing why
+(~1000 tokens per edit at ~90% false positives ≈ 55k tokens of noise
+per session, and a noisy gate gets baselined into inertness, which is
+worse than no gate).
+
+**What was deliberately preserved.** The thesis, the four properties,
+the full vocabulary (operator, leaf, budget, discharge sketch,
+consensus price, slice, perturbation, stigmergy, drift), the separation
+of powers, the ratchet. Those held under every load applied, and
+replacing working vocabulary would have been exactly the unforced churn
+the blueprint elsewhere warns against.
+
+**Status.** Gate green. The three surviving gates in § 6 are
+*recommended*, not built — the container does not yet implement them,
+and the blueprint says so rather than claiming coverage it lacks. That
+is the next slice.
