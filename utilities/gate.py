@@ -22,6 +22,12 @@ Checks:
      pre-commit hook file and does nothing with it — commits would
      sail through ungated, silently. The gate detects its own
      bypass. Skipped before git init, so the seed workflow is clean.
+  6. The BLUEPRINT § 6 checks, each scored against the Primebeat_081426
+     corpus before adoption and each silent on a tree that has nothing
+     of its kind to check (entry 6):
+       check_flag_or.py           § 5.7  verdict flag from an `or` chain
+       check_rule_labels.py       § 5.1  prereg labels absent from its script
+       check_sidecar_preimage.py  § 9    sidecar with no recoverable pre-image
 
 Hazards this parser is built around, all paid for upstream: several
 files in this tree contain examples of themselves, so the notebook
@@ -33,6 +39,15 @@ import pathlib
 import re
 import subprocess
 import sys
+
+sys.path.insert(0, str(pathlib.Path(__file__).resolve().parent))
+import check_flag_or          # noqa: E402
+import check_rule_labels      # noqa: E402
+import check_sidecar_preimage  # noqa: E402
+
+# BLUEPRINT § 6: each scored on a real corpus before adoption, each
+# returning [] on a tree with nothing of its kind to check.
+SUBGATES = (check_flag_or, check_rule_labels, check_sidecar_preimage)
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 
@@ -202,13 +217,16 @@ def main():
                         f"the 'entry N: ' pointer format, so the reference "
                         f"is unchecked: {line!r}")
 
+    for mod in SUBGATES:
+        fails.extend(mod.check(ROOT))
+
     if fails:
         for f in fails:
             print(f"GATE RED  {f}")
         sys.exit(1)
     print(f"GATE GREEN  contract {contracts[0]}, "
           f"{len(REQUIRED)} required files, {len(entries)} notebook "
-          f"entries, NOTEPAD consistent.")
+          f"entries, NOTEPAD consistent, {len(SUBGATES)} § 6 checks quiet.")
     sys.exit(0)
 
 

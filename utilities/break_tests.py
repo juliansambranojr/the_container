@@ -107,6 +107,81 @@ def main():
     expect("git repo, hooksPath set -> green", "gate.py",
            git_with_hookspath, False)
 
+    # -- BLUEPRINT § 6 subgate scenarios (entry 6) ------------------
+    # Each of the three must fire on the defect it was scored against,
+    # and each must stay silent on a tree with nothing of its kind.
+    def flag_from_or(t):
+        (t / "utilities" / "sample_run.py").write_text(
+            "import argparse\n"
+            "args = argparse.Namespace(ceiling_pow=40)\n"
+            "gate_b_ok = (args.ceiling_pow != 40 or args.x0 != 1000.0)\n")
+    expect("verdict flag from an `or` chain -> red", "gate.py",
+           flag_from_or, True)
+
+    def flag_from_and(t):
+        (t / "utilities" / "sample_run.py").write_text(
+            "import argparse\n"
+            "args = argparse.Namespace(ceiling_pow=40)\n"
+            "gate_b_ok = (args.ceiling_pow == 40 and args.x0 == 1000.0)\n")
+    expect("same flag from an `and` chain -> green", "gate.py",
+           flag_from_and, False)
+
+    def labels_not_in_script(t):
+        (t / "preregs").mkdir(exist_ok=True)
+        (t / "preregs" / "demo_v1_20260827.md").write_text(
+            "# Prereg — demo\n\n## Decision rule\n\n"
+            "1. `compromised` — integrity failed.\n"
+            "2. `supported` — H1 conditions.\n"
+            "3. `inconclusive` — anything else.\n\n"
+            "| script | `demo_run.py` |\n")
+        (t / "demo_run.py").write_text(
+            'print("the rule lives in prose only")\n')
+    expect("prereg labels absent from its script -> red", "gate.py",
+           labels_not_in_script, True)
+
+    def labels_in_script(t):
+        labels_not_in_script(t)
+        (t / "demo_run.py").write_text(
+            'labels = [("compromised", lambda r: r.bad),\n'
+            '          ("supported", lambda r: r.h1),\n'
+            '          ("inconclusive", lambda r: True)]\n'
+            'fired = [n for n, p in labels if p(result)]\n'
+            'assert len(fired) == 1, f"RULE DOES NOT PARTITION: {fired}"\n')
+    expect("prereg labels present as a predicate table -> green",
+           "gate.py", labels_in_script, False)
+
+    def unresolvable_script(t):
+        (t / "preregs").mkdir(exist_ok=True)
+        (t / "preregs" / "demo_v1_20260827.md").write_text(
+            "# Prereg — demo\n\n## Decision rule\n\n"
+            "1. `compromised` — integrity failed.\n\n"
+            "| script | `no_such_script.py` |\n")
+    expect("prereg names a script that does not resolve -> red",
+           "gate.py", unresolvable_script, True)
+
+    def sidecar_no_preimage(t):
+        subprocess.run(["git", "init", "-q"], cwd=t, check=True)
+        subprocess.run(["git", "config", "core.hooksPath",
+                        "utilities/hooks"], cwd=t, check=True)
+        (t / "preregs").mkdir(exist_ok=True)
+        (t / "preregs" / "demo_v1_20260827.md").write_text("locked text\n")
+        (t / "preregs" / "demo_v1_20260827.sha256").write_text("0" * 64 + "\n")
+    expect("sidecar with no recoverable pre-image -> red", "gate.py",
+           sidecar_no_preimage, True)
+
+    def sidecar_matches_worktree(t):
+        import hashlib
+        subprocess.run(["git", "init", "-q"], cwd=t, check=True)
+        subprocess.run(["git", "config", "core.hooksPath",
+                        "utilities/hooks"], cwd=t, check=True)
+        (t / "preregs").mkdir(exist_ok=True)
+        body = b"locked text\n"
+        (t / "preregs" / "demo_v1_20260827.md").write_bytes(body)
+        (t / "preregs" / "demo_v1_20260827.sha256").write_text(
+            hashlib.sha256(body).hexdigest() + "\n")
+    expect("sidecar pinning the current text -> green", "gate.py",
+           sidecar_matches_worktree, False)
+
     # -- adjudicate.py scenarios ------------------------------------
     def unimported_module(t):
         (t / "adjudications/Adjudications/Bogus.lean").write_text(

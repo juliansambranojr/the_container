@@ -365,24 +365,70 @@ entire value is silence when nothing is wrong. **A noisy gate gets
 baselined into inertness, which is worse than no gate**, because it
 leaves the appearance of coverage.
 
-Three survived scoring, and are the recommended starting set:
+### 6.1 · What this section recommended, and what survived building it
 
-1. **Flag-from-or-chain.** One grep: a boolean reporting a check's
-   verdict must not be assigned from a short-circuiting `or`. Measured:
-   1 hit, the real defect, 0 false positives.
-2. **Numbers-in-prose.** Every number stated in the record appears in
-   the artifact its source line names, within rounding. Extend an
-   existing checker's scan set to cover the record and the preregs
-   rather than building a second checker. Measured: this would have
-   caught § 5.9's error four entries before a human did.
-3. **Throwaway-invocation warning.** When an ad-hoc command both reads
-   a result artifact and slices it, warn. Catches § 5.9 where it
-   happens.
+This section first recommended three gates. They were then built —
+under an instruction to derive candidates independently *before*
+reading the three, and to score everything. Sixteen candidates were
+generated, thirteen died, and the three that shipped are **not** the
+three recommended here. The record of that, because the delta is the
+point:
 
-Behind all three: **intercept at the invocation layer, not at the call
+**Shipped, and each verified firing on the ground-truth defect:**
+
+1. **Label-parity** (`check_rule_labels.py`) — every verdict label a
+   prereg names must appear in the script the prereg names. **This was
+   not among the three recommended.** It is the sharpest of the sixteen
+   because it sidesteps what killed the text-parsing candidates: rather
+   than trying to read a prose rule, it asks the one decidable
+   question — *are the labels in the code at all?* A label the script
+   has never heard of cannot have been computed by it, so the
+   exactly-one-fires assertion cannot exist either. That is § 5.1's
+   root cause reduced to a decision. Measured: 1 fire, the real defect,
+   0 false positives, 0 undefined.
+2. **Flag-from-or-chain** (`check_flag_or.py`) — a boolean reporting a
+   check's verdict must not be assigned from a short-circuiting `or`.
+   Measured: 1 fire, the real defect, 0 false positives.
+3. **Sidecar pre-image** (`check_sidecar_preimage.py`) — every sidecar
+   must match the file at some commit in history. Measured: 8 fires, 8
+   true positives. **This section's own table called it "the only one
+   that found something real" and then omitted it from the recommended
+   three — an inconsistency the builder caught and this paragraph
+   records.**
+
+**Recommended here and killed on the numbers:** *numbers-in-prose*
+scored ~1% precision on the record and is **undefined at the defect it
+was meant to catch** — the entry holding the bad number names no
+artifact, because the record separates the run entry from the reading
+entry, and the bad number was a *ratio*, which is absent from any
+artifact by construction. *Throwaway-invocation* proved unscoreable:
+no corpus of past invocations exists, and shipping it unscored would
+have broken this section's own rule, so it did not ship.
+
+**The rule that separated survivors from deaths, found by building:**
+every gate that shipped scans **mutable** state — source, links,
+sidecars against git. Every one that died scans the **append-only
+record**. A record-scanning gate can never be silent when clean,
+because a true positive in a historical entry fires forever, and an
+entry cannot be edited to fix it. That is a sharper selection rule than
+precision alone, and it was invisible until sixteen candidates were
+scored.
+
+**Cost, measured:** 0.03–0.05 s and ~28 tokens for the whole set when
+clean; ~700 tokens firing on a corpus containing every known defect.
+
+Behind all of it: **intercept at the invocation layer, not at the call
 sites.** One implementation covers every script including the ones
 nobody has touched — the alternative here was seventy-five edits across
 three call-site shapes, each owing a re-run.
+
+**And the method survived its own first application.** A generator
+proposed three gates; an independent derivation produced sixteen and
+kept a different three, two of which the generator had missed or
+misplaced. Had the three above been adopted as written, two would have
+been noise and the best available check would have been left on the
+table. Score before adopting — including when the proposal is in this
+document.
 
 ---
 
@@ -521,6 +567,13 @@ refusal.
 
 **Unchanged:** the thesis, the four properties, the vocabulary, the
 separation of powers, the ratchet. Those held under every load applied.
+
+**Amended after building (§ 6.1).** § 6's three recommendations were
+tested by construction and two did not survive; the shipped set differs
+and the reasons are recorded in place rather than by rewriting the
+recommendation. The inconsistency between § 6's table and its
+recommended three — the sidecar check named as the only real find, then
+omitted — was caught by the builder and is noted where it occurred.
 
 ---
 
