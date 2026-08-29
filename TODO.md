@@ -573,11 +573,41 @@ setup step — settings present, hook wired, flag path writable — so it
 needs the same liveness check, or a clone ships an interception that
 silently does not intercept.
 
-**Escape hatch, visible.** Legitimate direct writes exist: the operator
-asks for a typo repair, or an approved sweep edits many lines at once.
-Blocking those is friction that will get the hook disabled. The escape
-must be explicit and recorded, never silent — a silent escape is
-indistinguishable from a broken gate.
+**No generator-invocable escape. The operator is the gate.**
+*Operator's decision, 2026-08-29.* An override the generator can invoke
+is the generator adjudicating its own exception — the thing § 7 forbids
+by construction, and the concession finding directly beneath it says why
+it would not hold: given an override, a generator produces
+justifications for using it, and from the inside those justifications
+are indistinguishable from reasoning. The escape would become the path.
+
+**Instead the write is parked, not blocked and not allowed.** The gate
+is a queue. A direct write to an owned destination is diverted to a
+staging area, the generator is told in one line that it was parked, and
+the work continues. The operator reviews and approves at a boundary —
+the same boundaries § 2 already names. Velocity is preserved because
+nothing stops; authority is preserved because nothing lands unapproved.
+
+**This unifies three items that were separately underspecified:**
+
+- a staged write has a first-seen date and accumulates, so it is an
+  **itch source** — § 6's ticker surfaces it as a count with the same
+  age gate, no new machinery;
+- a staged write is already in **§ 7's parseable format**, so approval
+  is running the parser over the queue rather than a bespoke flow;
+- § 7.8's interception now has a defined destination for what it
+  catches, instead of a decision it cannot make.
+
+**The wording constraint is load-bearing.** The generator must be told
+**parked**, never **filed**. Ambiguous language produces a report that
+the entry was filed when it was not, and "I filed it" diverging from
+"it was filed" is precisely the failure the record exists to prevent
+(§ 7.2). One line, unambiguous verb.
+
+**No silent expiry.** A staged write dropped without a decision is worse
+than one refused, because the generator believes it landed. The queue
+only shrinks by an operator decision, and an old entry in it is debt to
+be surfaced, never garbage to be collected.
 
 ---
 
