@@ -511,20 +511,106 @@ determines when a model invokes it. Candidates: a run completes; a
 theorem, script, or mechanism lands; the operator says to log it; a
 correction or reframe arrives; the operator asks what is open.
 
-**The silent-miss failure, and its backstop.** A skill fires at the
-generator's discretion. If it is not invoked, nothing is filed **and
-nobody notices** — the same class as a generator forgetting to offer the
-log, which is a documented failure in the source program's own rules.
+**The silent-miss failure.** A skill fires at the generator's
+discretion. If it is not invoked, nothing is filed **and nobody
+notices** — the same class as a generator forgetting to offer the log,
+which is a documented failure in the source program's own rules.
 Discretion cannot be the only safeguard for a mechanism whose purpose is
 to survive the generator's attention.
 
-Backstop: a detector for **an unrecorded run** — a results artifact
-exists and no record entry cites it. Mechanically checkable, needs no
-judgment, and it is the natural second detector for § 6's ticker. Filed
-there as well.
+**Two backstops, covering two different failures.** Neither subsumes the
+other, and the distinction is the whole design:
+
+- **Filed by the wrong path** — the generator writes to a destination
+  the skill owns without invoking the skill. There *is* a write to
+  intercept. Covered by § 7.8.
+- **Not filed at all** — the work finishes and no write is attempted.
+  There is nothing to intercept. Covered by a detector for an
+  **unrecorded run**: a results artifact exists and no record entry
+  cites it. Mechanically checkable, needs no judgment, and it is the
+  natural second detector for § 6's ticker. Filed there as well.
+
+### 7.8 · Interception at the skill's first owned action
+
+**Operator's design, 2026-08-29.** The guard fires at the first action
+the skill owns. If the skill's job includes writing an index line and
+the generator reaches for the index without having invoked the skill,
+the hook returns it to the skill. If the skill was already invoked, the
+write passes through — an iron gate, closed only against the wrong path.
+
+**This is not a new principle.** § 6 closes with "intercept at the
+invocation layer, not at the call sites," and the source program already
+ships the pattern: `utilities/hooks/check_direct_run.py` is a PreToolUse
+hook whose Check 1 **blocks a measurement script invoked directly** and
+routes it through `utilities/run.py`, because direct runs overwrote
+their own prior results three times and left artifacts with no dated
+record. Same shape, different surface.
+
+**Why it beats a post-hoc detector for the case it covers.** It fires at
+the moment of the mistake, while the generator is already in the right
+context, so the correction costs almost nothing. And it accumulates no
+debt: the itch is prevented rather than recorded for later discharge.
+
+**The flag lifecycle is the crux, and a naive version goes inert.** The
+hook must know whether a skill invocation is live. A session-scoped
+set-once flag fails: after the first filing the gate passes everything
+for the rest of the session. The working version is a flag meaning **an
+invocation is in flight** — set when the skill fires, cleared by the
+parser on a successful file. Writes to owned destinations are permitted
+only while one is in flight, so every filing moment needs its own
+invocation and the gate stays live all session.
+
+**It must guard every owned destination, not only the first.** A guard
+on the index alone is walked around by writing the record directly. The
+set is enumerable and must be enumerated.
+
+**Entry 4's lesson applies recursively.** That entry's finding was that
+a guard depending on an unperformed setup step is not a guard: a fresh
+clone carried `pre-commit` in a tracked directory and silently gated
+nothing until `core.hooksPath` was set, and the repair was to make the
+gate detect its own unconfigured state. This interception is itself a
+setup step — settings present, hook wired, flag path writable — so it
+needs the same liveness check, or a clone ships an interception that
+silently does not intercept.
+
+**Escape hatch, visible.** Legitimate direct writes exist: the operator
+asks for a typo repair, or an approved sweep edits many lines at once.
+Blocking those is friction that will get the hook disabled. The escape
+must be explicit and recorded, never silent — a silent escape is
+indistinguishable from a broken gate.
 
 ---
 
-## 8 · (next item)
+## 8 · The starting kit ships no tool-call interception
+
+**Status:** open. **Found 2026-08-29 while specifying § 7.8.**
+
+**The finding.** This repository has **no `.claude/settings.json`**. The
+source program has one, wiring two surfaces: `PostToolUse` on
+`Edit|Write|MultiEdit|NotebookEdit` running the record gate, and
+`PreToolUse` on `Bash` running `check_direct_run.py`.
+
+So the invocation-layer interception that § 6 names as the principle —
+"intercept at the invocation layer, not at the call sites" — exists in
+the test case and **not in the prototype it was extracted from**. A
+project copying this tree gets the pre-commit hook, the gates, and the
+record, and gets no tool-call interception at all.
+
+**Why it matters beyond tidiness.** § 10's starting kit is the claim
+about what a minimal container is. If the interception surface is
+load-bearing enough that § 6 closes on it and § 7.8 depends on it, then
+either it belongs in the kit or § 10 should say plainly that it is a
+later addition and why. Right now it is neither: absent from the kit and
+absent from the discussion.
+
+**OPERATOR — decide.** Ship a settings file in the kit (and accept that
+it is tool-specific, which § 9 places in layer 2), or document the
+omission in § 10 with the reason. The second is defensible — layer 2 is
+explicitly convenience that enforces layer 1 — but it should be a
+recorded choice rather than a gap.
+
+---
+
+## 9 · (next item)
 
 To be added.
