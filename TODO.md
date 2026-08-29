@@ -721,6 +721,59 @@ earn their cost, and whether closure nodes are enumerated by hand or
 detected (an entry that discharges a leaf, ships a script, or pins a
 theorem is a candidate closure by its own content).
 
+### 9.5 · The map as an audit instrument, not only navigation
+
+**Operator's framing, 2026-08-29.** Every edge from an open or closed
+node is traceable by both parties, so each can catch what the other
+missed. The value is not that the operator can find an entry; it is that
+**both look at the same surface instead of at two memories.**
+
+**The existing tool names this gap in its own docstring.** The source
+program's `utilities/check_refs.py` validates four token types — paper
+sections, Lean declarations, scripts, results paths — and then says:
+*"It checks that a target EXISTS. It cannot check that the target says
+what the citing line claims,"* citing the miss that proves it (entry 88:
+a section about RH cited for a claim about analytic continuation).
+Existence held; meaning did not.
+
+It already ships `--audit`, which *"pair[s] every cross-document `§`
+citation with the text it points at, for review. Reads nothing about
+meaning; the judgement is a person's."* **That is the traversal, already
+implemented, emitted as a list** — which is the form the operator is
+saying does not work. The map is the rendering, not a new capability.
+
+**The class of defect only a map surfaces: linked claims that disagree.**
+`BLUEPRINT.md:512` and the source program's `preregs/FORMAT.md:59` state
+different counts for the same fact (§ 1.3). That is the entry-88 shape,
+and it was found because a file happened to be opened. Adjacent in a
+view, the two claims disagree on sight. No gate catches it — judging it
+requires reading meaning. No list surfaces it — you would have to
+suspect it before going to look.
+
+### 9.6 · Link records, not filesystem symlinks
+
+**Engineering constraint.** The ask names symlinks to results,
+references, web pages, and commits. Real filesystem symlinks are fragile
+in a tracked tree: they break across clones on some platforms, can point
+outside the repository, and some tooling mishandles them.
+
+The portable form is a **link record** — a path, commit SHA, or URL
+written in text and validated by the gate that already exists. Same
+navigability, survives a clone, stays layer 1. `check_refs.py` already
+validates three of the four kinds; commit SHAs and URLs are the
+additions, and a SHA is checkable against git while a URL is not
+(record it, do not pretend it is gated).
+
+### 9.7 · What the node carries
+
+A closure node is a hub, not a text entry. Minimum contents:
+
+- the artifact it names (theorem, script, mechanism, paper);
+- its ancestry, by typed edge (§ 9.2);
+- link records to results, references, commits, external sources;
+- open/closed state, inherited from the index rather than restated —
+  **one authority per fact** (§ 9).
+
 ---
 
 ## 10 · (next item)
