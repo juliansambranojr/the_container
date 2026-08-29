@@ -598,11 +598,19 @@ nothing stops; authority is preserved because nothing lands unapproved.
 - § 7.8's interception now has a defined destination for what it
   catches, instead of a decision it cannot make.
 
-**The wording constraint is load-bearing.** The generator must be told
-**parked**, never **filed**. Ambiguous language produces a report that
-the entry was filed when it was not, and "I filed it" diverging from
-"it was filed" is precisely the failure the record exists to prevent
-(§ 7.2). One line, unambiguous verb.
+**The queue state is binary: open or closed.** *Operator's decision,
+2026-08-29.* While a staged write is **open** it is live, held in
+scratch, and available; when the operator decides it is **closed**.
+This inherits NOTEPAD's existing status vocabulary rather than inventing
+a second word for a state the system already names, and it is cleaner
+than a parked/filed pair, which conflates two axes — queue state and
+outcome. Open/closed is queue state alone; **the record itself is the
+authority on what landed**.
+
+The safety property survives the change: **open** unambiguously means
+not yet in the record, so a generator reporting honestly cannot claim
+an open write was filed. That divergence — "I filed it" against "it was
+filed" — is precisely the failure the record exists to prevent (§ 7.2).
 
 **No silent expiry.** A staged write dropped without a decision is worse
 than one refused, because the generator believes it landed. The queue
@@ -641,6 +649,80 @@ recorded choice rather than a gap.
 
 ---
 
-## 9 · (next item)
+## 9 · The record as a navigable graph — a node that opens to its history
+
+**Status:** open. **Operator's framing, 2026-08-29.** Related: § 7.5.
+
+**The ask.** Thread the record by stacking entries along a line of work,
+close the thread with the artifact or mechanism that names the closure,
+and let that closure open as a node expanding to its history.
+
+**Two findings that shrink the estimate.**
+
+*The edges already exist, at full density.* The source program's record
+carries **227 entries and 227 `refs:` fields** — every entry declares
+its ancestry. The graph is complete and specified in plain text today.
+This is not a format change plus a backfill.
+
+*The generated-view pattern is already proven in the tree.*
+`utilities/theorem_index.py` states it in its own docstring —
+"GENERATED, not written" — reading Lean source and emitting a table of
+every theorem with its claim, its axiom cost, and **what cites it**. An
+artifact-node index with provenance edges, produced from layer-1 source,
+never hand-maintained. The precedent holds.
+
+### 9.1 · The reframe: ancestry on demand, not a picture
+
+A rendering of 227 connected nodes is a hairball nobody reads. What the
+ask describes functionally is **a node that opens to its history** —
+an ancestry query on a DAG, not a visualization of the whole thing.
+Given a closure node, walk its edges back and stop:
+
+```text
+hEF → 271 → 269 → 267 → 264 → 262 → 257 → 130
+```
+
+That is cheap, it matches how the corpus is actually used (the operator
+refers to the object, not to the entry range), and it does not require
+the whole graph to be legible at once.
+
+### 9.2 · The real work is edge typing
+
+Every edge today is an undifferentiated `refs:`. These have genuinely
+different meanings when tracing why a decision was made:
+
+- **builds-on** — this entry stands on that one
+- **synthesizes** — this entry closes a chain (§ 7.5's field)
+- **corrects** — this entry says an earlier one was wrong; § 11 requires
+  corrections as new entries, so this edge is the only machine-visible
+  trace of a retraction
+- **discharges** — this entry closed a named leaf
+
+An untyped graph flattens a retraction into a citation, which is the one
+distinction the record most needs to preserve.
+
+### 9.3 · Hard constraint
+
+**The graph is a view. The record stays the authority.** Append-only,
+plain text, corrections as new entries (§ 9, § 11). Nothing is navigable
+that is not first readable by a stranger with `cat`. A generated view
+cannot rot, because it is regenerated; a hand-maintained one becomes a
+second home with no rule for which wins.
+
+### 9.4 · The cheap first slice
+
+**Render untyped ancestry from the 227 refs that already exist**, use
+it, and measure whether it is useful *before* paying for typing. If it
+is navigable untyped, typing improves it. If it is noise untyped, typing
+will probably not save it. No format change, no backfill, one script.
+
+**OPERATOR — decide after the slice**, not before: whether typed edges
+earn their cost, and whether closure nodes are enumerated by hand or
+detected (an entry that discharges a leaf, ships a script, or pins a
+theorem is a candidate closure by its own content).
+
+---
+
+## 10 · (next item)
 
 To be added.
