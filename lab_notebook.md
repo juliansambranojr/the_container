@@ -427,3 +427,67 @@ tokens clean. The method survived its own first application, which is
 the only reason to trust § 6 at all: had its three been adopted as
 written, two would have been noise and the best available check would
 have been left on the table.
+
+## Entry 8 — 2026-08-29 — setup — TODO.md: a mutable home for specs not yet built
+
+**What changed.** `TODO.md` added at the tree root, holding working
+specifications for container improvements that do not exist yet.
+
+**Why it is not a second home.** § 9 requires checking whether an
+authoritative home already exists before writing a new governing
+document. Two candidates were checked and both fail for the same
+structural reason. `NOTEPAD.md` is pointer-only — one line per thread
+with an `entry N:` reference — and a specification cannot be hashed out
+in one line. `lab_notebook.md` is append-only with corrections entered
+as new entries, so an evolving spec cannot be revised in place there.
+The gap is a *mutable* document, and neither existing artifact is one.
+
+**The boundary that keeps it from becoming an authority.** TODO holds
+only work not yet built. When an item ships it leaves the file and
+enters this record as a dated entry. TODO is never the authority on
+anything that exists.
+
+**Item 1 as filed.** The mechanism glossary — per-mechanism entries
+deeper than § 2's definitions, in the six-part shape worked for
+`sidecar` on 2026-08-29. The motivating gap: § 2 is sufficient to *use*
+a mechanism already understood, and insufficient either to recognize a
+known mechanism appearing in an unfamiliar domain under a local name, or
+to articulate the difference between two mechanisms that feel alike. The
+case that prompted it was gate versus pin, which § 2 cannot separate
+because it defines only one of them.
+
+The item carries three operator decisions undecided by design (home,
+scope, citation coupling), five candidate mechanisms marked **unscored**
+per § 6.1, and one defect to repair: `BLUEPRINT.md:512` states eight of
+nine preregs have no recoverable pre-image; the source program states
+four of nine and ground truth on 2026-08-29 is seven of eleven verifying.
+
+## Entry 9 — 2026-08-29 — scope — the three-body design: prototype, fit set, held-out test
+
+**Operator's framing, recorded because it governs what the container is
+for.** Three repositories, each feeding the others, arranged to reveal
+what is actually durable:
+
+1. **the_container — prototype.** Where the mechanisms are named and
+   the method is written.
+2. **Primebeat_081426 — test case.** Where the mechanisms were built
+   under load and where they are exercised hardest.
+3. **A new project, not yet chosen — the held-out test.** The container
+   becomes the scaffold *first*, in a domain whose failures did not
+   shape it, to test whether the proof of concept holds.
+
+**Why the third body is not optional, in the container's own
+vocabulary.** § 13 records that this method was built and stress-tested
+in Primebeat. That makes Primebeat the set the container was *fit to* —
+every mechanism here exists because a Primebeat failure taught it. A
+method cannot be falsified by the corpus it was derived from, however
+hard that corpus is run. The new project is the blind arm: the first
+place the container is asked to work before the domain's characteristic
+failures are known.
+
+**What that predicts, stated now so it is checkable later.** If the
+container is genuinely domain-agnostic, the new project should need
+*additions* (domain instances, local vocabulary, a domain-specific gate)
+and no *retractions* — no § 2 mechanism should turn out to be an artifact
+of number theory. A retraction would be the informative outcome and is
+the thing to watch for.

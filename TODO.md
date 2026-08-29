@@ -135,6 +135,150 @@ sits in § 9, the section about hash pre-images.
 
 ---
 
-## 2 · (next item)
+## 2 · The itch protocol — capture at friction, discharge at a boundary
+
+**Status:** open, unstarted. **Operator's framing, 2026-08-29.**
+
+**The observation.** A trap noticed mid-work is an itch. You can ignore
+it for a while, but eventually you have to scratch it — fix the thing —
+and then apply ointment, the script or rule that stops it recurring.
+Both are necessary. Neither is the hard part.
+
+**The hard part is timing.** Fixing scaffold while executing a test
+deviates the work from project to scaffold. Those are the same thing,
+but moving between them costs a context switch for the model *and* the
+operator. Pay that cost at the wrong moment and the exploration loses
+its thread; refuse to pay it at all and the trap recurs forever.
+
+**The protocol, therefore, is two-phase and the phases are separated in
+time:**
+
+- **At friction — capture only.** Name it, flag it, one line, keep
+  working. Cheap by construction: no fix, no script, no design. The
+  cost of capture must stay below the cost of the context switch, or
+  the generator will skip it under load.
+- **At a boundary — scratch and apply ointment.** Fix the thing, then
+  build the rule or script that prevents recurrence. The context switch
+  is paid once, deliberately, at a moment already dedicated to looking
+  up rather than forward.
+
+**The boundaries already exist in practice** and should be named rather
+than invented: an operator asking what is open; the pre-compaction
+ratchet; end of session; the index sweep. Each is already a moment when
+attention has left the work and moved to the record.
+
+**What this adds that the container lacks.** § 8's loop has no sweep
+step. The ratchet preserves green states; nothing schedules remediation.
+Traps therefore accumulate with no defined moment of discharge, which is
+exactly what happened in the source program — the same trap
+(`Iio_mem_nhds` is a membership, not an `Eventually`) bit twice in one
+session because the first bite was never written down.
+
+### 2.1 · Open questions
+
+- **OPERATOR — naming.** "Itch protocol" is the operator's metaphor and
+  is good; whether the mechanism ships under that name or a plainer one
+  (deferred remediation) is a call, and the metaphor's advantage is that
+  it carries the two-phase structure inside it.
+- Does capture write to the paid-once record, to NOTEPAD as an `[open]`
+  line, or to a third lightweight place? NOTEPAD costs an entry pointer,
+  which may exceed the capture budget.
+- Is the boundary set enumerable, or is it "whenever the operator asks"?
+  An enumerable set can be checked; a discretionary one cannot.
+
+---
+
+## 3 · Trap graduation — the paid-once record is a pipeline, not a home
+
+**Status:** open, unstarted. **Operator's framing, 2026-08-29.**
+
+**The observation.** The trap ledger works, and it also accumulates
+things that should not stay prose. Some traps are inert facts (a lemma
+was renamed; nothing can automate that). Others are checkable and should
+become gates. Others are procedural and should become workflow steps
+that fire automatically, so the generator never has to remember them.
+
+**So each trap carries a disposition,** assigned when it is recorded:
+
+- **inert** — a fact to be read. Stays prose forever, legitimately.
+- **gate candidate** — mechanically checkable. Enters § 6's pipeline
+  and gets scored against the real corpus before adoption. Most will
+  die; that is the point.
+- **workflow step** — not a check but an action that belongs at a
+  known stage of the loop. Fires from the chart (item 4) rather than
+  from memory.
+
+**Why the disposition matters.** Without it, the ledger's length is
+ambiguous: a long ledger might mean a well-documented environment or a
+large pile of unautomated debt, and nothing distinguishes them. With
+dispositions, the count of ungraduated `gate candidate` entries *is*
+the debt, and it is visible.
+
+**Prior art in the tree.** § 6 already defines the scoring pipeline a
+gate candidate must pass. This item connects the ledger's front end to
+it; it does not propose new adoption criteria.
+
+---
+
+## 4 · Workflow chart with dependencies — the loop as something that fires
+
+**Status:** open, unstarted. **Operator's framing, 2026-08-29.**
+
+**The ask.** A chart of stages with their dependencies, so that skills
+and checks fire at the stage that needs them and the generator executes
+and backfills rather than reasoning about which step comes next.
+
+**Why this is the document's own trajectory rather than an addition.**
+§ 1.1 records the correction that produced the second draft: *a rule,
+written down in a place the generator reads, is not a rule.* § 5.1
+applied that to decision rules — prose that could not assert became a
+predicate table that does. § 8's loop is still prose: nine numbered
+steps a generator must read, interpret, and remember to apply. It is the
+largest remaining piece of the method that is read rather than executed.
+
+**What the chart needs to carry per stage**, at minimum: the stage's
+preconditions (what must be green before it may start), what fires
+automatically at it, what the generator must produce, and what may not
+happen before it. The lock-commit-then-run corollary in § 9 is exactly
+a dependency edge and is currently enforced by a human remembering it.
+
+### 4.1 · Open questions
+
+- **OPERATOR — form.** A markdown table, a diagram, or a machine-readable
+  file that a hook consumes? Only the third can fail loudly, and § 1.1
+  argues that the difference matters more than it appears.
+- Does the chart replace § 8 or annotate it?
+- Which stages already have automatic firing (the pre-commit hook, the
+  invocation layer) and which are still discretionary? Enumerate before
+  designing; the answer sizes the work.
+
+---
+
+## 5 · Port theorem/pin parity to the sibling package
+
+**Status:** open, ready — this one is not a candidate needing a score.
+
+**The finding, 2026-08-29.** The container's adjudicate gate already
+prints `theorem/pin parity holds`. The mechanism exists here, running,
+proven. It is simply not applied to `Primebeat_081426/lean_stage3`,
+where an audit the same day found five modules drifted: `PerronKernel`
+at 31 theorems against 5 pins, `ContourShift` 30/15, `EdgeBound` 15/5,
+`ZetaGrowth` 18/8, `VonKochScaffold` 21/2, plus `LineBound` 70/10 which
+predates and is already flagged in that program's roadmap.
+
+**Why it is not a § 6 candidate.** § 6 requires scoring before adoption
+because a proposed gate is a guess. This one is running in this
+repository, and by § 6.1's selection rule it is the surviving kind: it
+scans **mutable** source, so it goes silent when the tree is clean.
+
+**Why it is a container item and not only a Primebeat item.** The check
+is currently welded into one repository's adjudicate gate. Extracting it
+as a portable utility is the container's work; applying it to the
+sibling package is the test case. That split is the three-body design
+(entry 9) in miniature.
+
+---
+
+## 6 · (next item)
 
 To be added.

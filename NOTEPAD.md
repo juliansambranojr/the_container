@@ -25,6 +25,8 @@ grep 'entry 1'                   # all lines pointing at entry 1
 
 ## Threads
 
+- [open]   2026-08-29  entry 9: three-body design — container is the prototype, Primebeat the set it was FIT to, a new unchosen project the held-out test; a method cannot be falsified by the corpus it was derived from, so the blind arm is the third body
+- [open]   2026-08-29  entry 8: TODO.md added for specs not yet built (NOTEPAD is pointer-only, notebook is append-only, neither is mutable); item 1 is the mechanism glossary, carrying 3 operator decisions, 5 unscored candidates, and BLUEPRINT:512's wrong pre-image count
 - [open]   2026-08-27  entry 7: § 6's three recommendations were tested by construction — two died, the shipped set differs, and the best gate (label-parity) was one § 6 never proposed; blueprint amended in place so the delta has provenance
 - [open]   2026-08-27  entry 7: selection rule found by building — gates that scan MUTABLE state ship, gates that scan the APPEND-ONLY record cannot ever be silent when clean; § 6 had not stated it
 - [open]   2026-08-27  entry 5: build the three gates § 6 scored and kept — flag-from-or-chain, numbers-in-prose over the record, throwaway-invocation warning; blueprint recommends them, container does not yet implement them
