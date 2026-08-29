@@ -279,6 +279,91 @@ sibling package is the test case. That split is the three-body design
 
 ---
 
-## 6 · (next item)
+## 6 · The itch ticker — accumulation without the model keeping score
+
+**Status:** open, specified, **not prototyped**. Sub-item of § 2.
+
+**The ask, 2026-08-29.** Accumulate open problems without relying on the
+generator to remember them, and surface the *score* of what has not been
+checked — the way a stale credential produces a system reminder: enough
+to land, not enough to derail momentum.
+
+**The inversion that makes it work.** If the generator writes the itch
+lines, the file is only as good as the generator's attention and nothing
+has changed. So **detectors append, the model does not.** A check runs,
+finds drift, and writes its own line. The model never has to notice.
+Manual capture stays available for traps no detector can see, but it is
+the minority path, not the mechanism.
+
+**Two sources, different reliability:**
+
+- **Detected** — a non-blocking check finds a condition and records it.
+  Machine-owned end to end. Pin parity is the worked example: it drifted
+  across five modules of the sibling package for weeks and no human or
+  model noticed.
+- **Captured** — the generator hits a trap and writes one line. Cheap by
+  construction (§ 2's capture budget). Still model-dependent, and known
+  to be.
+
+**Firing on age, not existence.** This is the velocity answer. An itch
+recorded ten minutes ago earns silence; one carried across sessions
+earns a line. The ticker is therefore quiet during flow and audible at
+the boundary — § 2's timing rule expressed as a threshold rather than a
+habit. Output is a **count, not a list**: `3 itches, 1 due` is under ten
+tokens. The list renders only at discharge, when the operator asks.
+
+**Why this is not NOTEPAD.** Different ownership and lifecycle.
+`NOTEPAD.md` is human-owned, entry-pointed, and its status transitions
+belong to the operator alone. An itch record is machine-owned, has no
+entry pointer, and is **self-healing** — when the drift is repaired the
+detector stops reporting it and the line clears without anyone
+transitioning it. An operator-owned index and a machine-owned debt
+register are not the same artifact, so this is a new part rather than a
+second home (§ 9).
+
+**Idempotency is a hard requirement.** A detector that runs fifty times
+must not write fifty lines. The record is keyed on
+`(detector, subject)` and updated in place, which makes it a *state*
+file rather than an append-only one — the third such shape in the tree,
+alongside the append-only record and the pointer-only index.
+
+### 6.1 · Shape
+
+- an itch record, keyed, one line per open item, carrying first-seen
+  date and source (`detected:<check>` or `captured`);
+- one or more non-blocking detectors that write to it and clear from it;
+- a ticker that reads it and emits a one-line score, silent unless
+  something is past the age threshold;
+- wired into the existing hook, which already runs on Edit/Write and
+  whose clean cost § 6 measured at ~28 tokens.
+
+### 6.2 · Scoring plan, before any wiring
+
+§ 6 requires a proposed check to be scored against the real corpus
+before adoption, and § 11 refuses a check adopted because it sounds
+right. This one is a notifier rather than a gate, but the failure mode
+§ 6 identified applies with full force: **a ticker that fires every
+session becomes wallpaper in about a week**, and wallpaper is worse than
+nothing because it leaves the appearance of coverage.
+
+What must be measured before wiring:
+
+- **The age threshold, measured not guessed.** Replay the source
+  program's history: at what age would a real itch have fired, and how
+  many sessions would have seen a line? Target: silent in the large
+  majority of sessions.
+- **Token cost clean and firing**, against § 6's measured baseline.
+- **False-positive rate of each detector**, on the real tree.
+- **Self-healing verified** — repair the drift, confirm the line clears
+  with no human action. An itch that needs manual closing is a NOTEPAD
+  line wearing the wrong clothes.
+
+**OPERATOR — prototype?** Building it is what scoring requires; wiring
+it is what needs the operator's approval afterward. Per the
+audit-before-execute split, this item stops here until you say build.
+
+---
+
+## 7 · (next item)
 
 To be added.
