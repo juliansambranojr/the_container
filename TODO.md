@@ -298,9 +298,12 @@ the minority path, not the mechanism.
 **Two sources, different reliability:**
 
 - **Detected** — a non-blocking check finds a condition and records it.
-  Machine-owned end to end. Pin parity is the worked example: it drifted
-  across five modules of the sibling package for weeks and no human or
-  model noticed.
+  Machine-owned end to end. Two known candidates: **pin parity**, which
+  drifted across five modules of the sibling package for weeks with no
+  human or model noticing; and **unrecorded run** — a results artifact
+  exists and no record entry cites it — which is the backstop for
+  § 7.7's silent-miss failure. Two detectors is the minimum that makes
+  the ticker worth building over a plain gate.
 - **Captured** — the generator hits a trap and writes one line. Cheap by
   construction (§ 2's capture budget). Still model-dependent, and known
   to be.
@@ -468,13 +471,57 @@ only the entry point moves.
 - Which destinations does the format cover in v1? Record entry and index
   line are the minimum; trap record and open items may follow once § 3
   and § 6 settle their shapes.
-- Does the parser run as a hook, a command the operator invokes, or
-  both? A hook files without asking, which conflicts with § 7.4's rule
-  that filing happens on the operator's word.
+- ~~Does the parser run as a hook, a command, or both?~~ **Resolved
+  2026-08-29: a skill, triggered by the task** — see § 7.7. A hook files
+  without asking (conflicts with § 7.4); a typed command reintroduces
+  the friction the item exists to remove. A task-triggered skill fires
+  when the work reaches a filing moment, which is the operator's word
+  expressed as a task.
 - Does the append format revise an entry, or does it always create a new
   one? § 11 refuses corrections folded into originals, which suggests
   new-entry-always — but a reframe arriving two minutes later is not a
   correction, and the boundary needs stating.
+
+### 7.7 · The skill is layer 3 and must stay thin
+
+**Operator's decision, 2026-08-29: the parser is invoked by a skill,
+triggered by the task.**
+
+**The constraint this inherits.** § 9 places assistant skills in layer 3
+— "forfeit on a swap; may point at layer 1, must never be its only
+home" — and records a proposal that failed exactly this test by putting
+work-tree paths into a skill *and* duplicating the discipline into a new
+tree document: two homes, no rule for which wins, guaranteed drift.
+
+**So the split is fixed:**
+
+- **Format spec — layer 1.** A plain file in the tree. The authority.
+- **Parser — layer 1.** A script in `utilities/`. Runnable by hand.
+- **Skill — layer 3.** A thin pointer: read the spec, emit in that
+  shape, call the parser. **It defines nothing.** Its whole content is
+  the trigger conditions and two paths.
+
+A model swap then costs the auto-triggering and nothing else. A
+different generator reads the spec and files by hand, which is exactly
+today's behavior.
+
+**Trigger conditions belong in the skill description**, and they need
+enumerating rather than gesturing, because the description is what
+determines when a model invokes it. Candidates: a run completes; a
+theorem, script, or mechanism lands; the operator says to log it; a
+correction or reframe arrives; the operator asks what is open.
+
+**The silent-miss failure, and its backstop.** A skill fires at the
+generator's discretion. If it is not invoked, nothing is filed **and
+nobody notices** — the same class as a generator forgetting to offer the
+log, which is a documented failure in the source program's own rules.
+Discretion cannot be the only safeguard for a mechanism whose purpose is
+to survive the generator's attention.
+
+Backstop: a detector for **an unrecorded run** — a results artifact
+exists and no record entry cites it. Mechanically checkable, needs no
+judgment, and it is the natural second detector for § 6's ticker. Filed
+there as well.
 
 ---
 
