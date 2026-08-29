@@ -364,6 +364,120 @@ audit-before-execute split, this item stops here until you say build.
 
 ---
 
-## 7 · (next item)
+## 7 · Structured emission — synthesize once, render twice, file by parser
+
+**Status:** open, specified. **Operator's framing, 2026-08-29.**
+
+**The ask.** The generator emits one structured response that a parser
+routes to its destinations — record entry, index line, trap record,
+open items — instead of writing each by hand. Revisions and reframes
+arrive in an append format that parses the same way. An explicit
+off-record channel keeps adjacent or benign dialogue out of the record
+without suppressing it.
+
+**Prior art, and how it differs.** `Primebeat_081426/utilities/
+extract_run.py` already stages a record entry from the transcript window
+around a run, leaves `type:` for a human to choose from the documented
+vocabulary, and refuses `--append` until it is chosen. It works in the
+opposite direction: it **reconstructs after the fact**, so it must infer
+what happened. This item has the generator **emit while it still knows**.
+
+They compose rather than compete. Emission is the primary path;
+extraction is the recovery path for a session where nothing was emitted.
+Building the emitter does not obsolete the extractor.
+
+### 7.1 · The refinement: the saving is in synthesis, not in text
+
+The operator's reasoning is that answering *and* writing the entry costs
+twice the thinking. The cost is real, and it sits in the **synthesis** —
+deciding what happened and what mattered — not in the rendering.
+
+An entry and a reply have different readers. The entry is for a stranger
+six months out with no shared context; the reply is for the operator now,
+with all of it. Collapsing them into one text produces either entries
+that read like chat (context-dependent, opaque later) or chat that reads
+like a filing.
+
+**So the format carries the synthesis once and permits two renderings.**
+The generator decides what happened a single time; the parser and the
+reply draw from the same decided content in different shapes. This
+preserves the saving without flattening two audiences into one — and it
+removes the failure where the chat summary and the entry quietly
+disagree, because they can no longer be independently authored.
+
+### 7.2 · Hard constraints
+
+- **The parser refuses verdicts and status transitions.** Entries and
+  `[open]` lines are generator-writable and always have been. Verdict
+  lines and `[open] → [closed]/[paused]/[blocked]` are the operator's
+  alone (§ 7, § 11). A parser able to write those has moved a power
+  across the line the container is built on. This is a constraint on
+  the implementation, not a preference.
+- **Malformed blocks fail loudly.** A block that does not parse must
+  error, never drop silently. Otherwise "I filed it" and "it was filed"
+  diverge, which is precisely the failure the record exists to prevent.
+- **Type is never guessed.** The extractor's existing rule holds: the
+  vocabulary is fixed, and an entry fitting no type is flagged to the
+  operator, not assigned one.
+
+### 7.3 · Marker visibility
+
+**OPERATOR — decide.** The proposal allows silent markers, so the reply
+reads as ordinary prose while remaining parseable.
+
+*Recommendation: visible markers.* Invisible machine-executed state
+contradicts the method's first property — state lives in plain files,
+legible where it acts. A misfiring silent marker fails silently: text
+routes to the wrong destination or nowhere, and the discovery comes
+months later when the record is missing something the operator is
+certain was filed. A visible delimiter costs little to read and makes
+misfires obvious at the moment they happen.
+
+### 7.4 · Off-record
+
+Worth stating plainly: this creates no hiding place, because **nothing
+is filed today until the operator says so.** What changes is *when the
+writing happens* — synthesis is emitted and parked while it is fresh,
+then filed on the operator's word rather than reconstructed later.
+
+The rule that keeps it honest: on-record is marked, off-record is the
+default, and the generator never moves something already emitted as
+on-record into off-record.
+
+### 7.5 · Synthesis on arrival
+
+**The operator's second idea, and it is separable from the rest.**
+Entries accumulate along a line of work. When that work **lands** — a
+theorem proved, a script shipped, a mechanism named — a synthesis entry
+compresses the chain and points at the final object. Navigation is then
+by object; provenance stays recoverable by following the chain back.
+
+This already happens informally in the source program (an entry closing
+an arc narrates the entries behind it) but it is prose, so the chain is
+not machine-navigable. Making it a field in the entry header —
+`synthesizes: 257–271`, or similar — is cheap and makes the compression
+checkable: every entry in a synthesized range should be reachable, and a
+synthesis naming a range with a gap is a defect a gate could catch.
+
+**Constraint:** synthesis compresses navigation, never the record.
+Superseded entries are never edited or removed (§ 11). The chain stays;
+only the entry point moves.
+
+### 7.6 · Open questions
+
+- Which destinations does the format cover in v1? Record entry and index
+  line are the minimum; trap record and open items may follow once § 3
+  and § 6 settle their shapes.
+- Does the parser run as a hook, a command the operator invokes, or
+  both? A hook files without asking, which conflicts with § 7.4's rule
+  that filing happens on the operator's word.
+- Does the append format revise an entry, or does it always create a new
+  one? § 11 refuses corrections folded into originals, which suggests
+  new-entry-always — but a reframe arriving two minutes later is not a
+  correction, and the boundary needs stating.
+
+---
+
+## 8 · (next item)
 
 To be added.
