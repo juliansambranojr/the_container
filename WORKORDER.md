@@ -23,7 +23,7 @@ independent and may proceed in any order or in parallel.
 
 - **[2] itch protocol** ← needs 8 (capture has to fire from somewhere)
 - **[7] structured emission** ← needs 8 (7.8's interception is a hook)
-- **[9] MAP — blueprint.** ← needs the corpus inventory, which is
+- **[9→11] MAP — blueprint. DONE 2026-08-29 (TODO § 11).** ← needs the corpus inventory, which is
   **partially done**: paper coverage stops at entry 165 (measured),
   results envelope conformance is 66–95% by field (measured), five
   local link conventions exist and none join (read). **The map has no
@@ -34,8 +34,8 @@ independent and may proceed in any order or in parallel.
 - **[3] trap graduation** ← needs 2 (dispositions need a capture point)
 - **[6] itch ticker** ← needs 2 and at least two detectors; candidates
   are 5's parity check and 10's orphan class
-- **[9] MAP — build** ← needs 9's blueprint
-  builds: (undeclared — the blueprint names them)
+- **[11] MAP — build** ← blueprint done; S1 and S2 unblocked, S4 blocked on the operator
+  builds: `map_nodes.py`, `map_edges.py`, `map_render.py`
 
 ## Tier 3
 

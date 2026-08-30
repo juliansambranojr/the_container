@@ -925,6 +925,111 @@ weeks and 5,876 queries does.
 
 ---
 
+## 11 · BLUEPRINT — the map
+
+**Supersedes item 9's design.** Item 9 stays as the record of what was
+tried and killed; § 9.8's audit falsified four of its claims and its
+recommendation stands. This is the plan item 9 never had.
+
+**Goal, one line.** *A generated markdown map — one node per addressable
+thing, edges drawn only from links a gate already validates, rebuilt
+from the corpus.*
+
+### 11.1 · Why it is durable
+
+**Generated, never maintained.** `theorem_index.py` states it in its own
+docstring — "GENERATED, not written" — and `THEOREMS.md` is the
+most-used navigation surface in the source program. A hand-maintained
+map is a second copy of the truth and rots inside a week.
+
+**Built only on gated edges.** `check_refs.py` already validates paper
+`§` statements, Lean declarations by namespace *and* stem, script
+filenames, and `results/` / `preregs/` paths — **wherever they appear**,
+including inside notebook entries. A map derived only from those cannot
+show a broken link, because the link fails the gate before it reaches
+the map. **This is what removes the need for a second thing to watch
+it.** The map inherits an existing guarantee instead of needing its own.
+
+**Excludes `refs:` by rule.** It is the one link type no gate validates
+and the one that measured broken. Admitting it would forfeit the
+inherited guarantee.
+
+### 11.2 · Verified ground — measured 2026-08-29, not read from a spec
+
+| fact | value |
+|---|---|
+| notebook entries | 270, two volumes, numbering gated |
+| Lean declarations | `lean/` 311 theorems / 311 pins; `lean_stage3/` 269 / 129 |
+| paper statements | 456; **≥93%** carry a source line |
+| paper coverage | stops at **entry 165**; 106 entries (39%) uncovered |
+| results artifacts | 151; envelope conformance **95%** `script`, 95% `schema_version`, 76% `generated_utc`, **66%** `summary`; 103 carry `params.code_version` |
+| run manifests | **36** for 151 results |
+| results cited by no entry | **53 of 151** |
+| locked preregs with no verdict line | **8 of 11** |
+| tree portability | ~96% opens in any text editor; Lean reads as text, verifying needs a pinned toolchain |
+
+**Marked as unverified:** the source-line figure is a floor — `FORMAT.md`
+permits a source line to span several lines and the detector required
+one, so some of the 32 misses are the parser.
+
+### 11.3 · Node types, with their addresses
+
+Every one already has a stable identifier and a gate that checks it.
+
+`entry N` · `Namespace.decl` · `Paper.md § A3` · `Paper.md § A` ·
+`CLAUDE.md § Section Name` · `script.py` · `results/x.json` ·
+`preregs/<slug>_v<N>_<date>.md` · `results/runs/<utc>_<script>.json`
+
+The **notebook entry is the spine**: every piece of work has one across
+both eras, and entries already name theorems and paths in prose where
+`check_refs` is watching.
+
+### 11.4 · Slices, each one green build
+
+- **S1 — nodes.**
+  builds: `map_nodes.py`
+  Emit every node: id, type, source file and line, and conformance flags
+  (missing `summary`, missing source line, no verdict, uncited).
+  *Green when:* counts match § 11.2 exactly.
+- **S2 — edges.**
+  builds: `map_edges.py`
+  Extract only the four gated token types, plus manifest→script→artifact
+  and prereg→sidecar from structured JSON and filename convention.
+  *Green when:* every emitted edge resolves to a node from S1, and the
+  count is stable across two runs.
+- **S3 — backlinks.** Falls out of S2 by inversion. No new extraction.
+  *Green when:* for any node, inbound + outbound are both listed.
+- **S4 — render.**
+  builds: `map_render.py`
+  **BLOCKED on an operator decision:** one file per node (~1,200 files,
+  buys a backlink panel and a free renderer in the Obsidian/Foam/Quartz
+  ecosystem) versus one generated file per node type (small, greps well,
+  outbound only).
+- **S5 — conformance surfacing.** Non-conforming nodes render *as*
+  non-conforming — "no summary", "uncited", "no verdict" — rather than
+  being skipped. This is the self-evidence property: the gaps appear in
+  the map instead of needing a scanner to find them.
+
+### 11.5 · Acceptance test
+
+**Regeneration is deterministic:** build twice, diff is empty.
+
+**No phantom nodes:** every emitted id resolves to a real location.
+
+**The cold-reader test, and this is the one that decides it:** a reader
+who has never seen this project, given only the map, can start from
+`hEF` and reach the theorem that discharges it, its axiom pin, the
+entries that built it, and the commit — **without asking a human.** If
+it cannot do that, the map failed regardless of what the counts say.
+
+### 11.6 · Out of scope
+
+Typed edges and closure-node hubs (§ 9.2, § 9.7 — scored and killed by
+§ 9.8) · `refs:`-derived edges · search, ranking, keyword indexing · any
+modification to `Primebeat_081426` · a UI.
+
+---
+
 ## 10 · BLUEPRINT — a corpus that cannot be misread
 
 **Status:** specified, unbuilt. Operator's framing 2026-08-29.
