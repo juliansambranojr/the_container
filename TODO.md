@@ -925,6 +925,162 @@ weeks and 5,876 queries does.
 
 ---
 
-## 10 · (next item)
+## 10 · BLUEPRINT — a corpus that cannot be misread
 
-To be added.
+**Status:** specified, unbuilt. Operator's framing 2026-08-29.
+**Nothing here is built. No slice starts until § 10.4's questions are
+answered.**
+
+### 10.1 · Goal
+
+A corpus in which **a reader arriving with zero context cannot be wrong
+about the current state.**
+
+Testable form: given any claim in the tree, a cold reader can establish
+(a) whether it is current, (b) what it rests on, and (c) whether it was
+checked — **without asking a human and without running a separate
+system.**
+
+**The reader is a model, not a person at a search bar.** Established by
+measurement: 5,876 corpus queries across two weeks were made by a
+generator on the operator's behalf; the operator issued none directly.
+A model can read everything and never tires, so it does not need
+compression or ranking. It fails on **ambiguity**, not on volume. That
+inverts every precedent — Shepard's, Creative Commons, nutrition labels
+all compress for a limited reader.
+
+### 10.2 · The binding constraint
+
+**Operator, 2026-08-29:** *"I'll be damned if I spend another ten days
+making something that needs another thing to see the problems and
+drift."*
+
+**Therefore: no detector layer.** A scanner that finds drift is another
+thing to maintain, and it drifts too. The design rule that follows:
+
+> **Every integrity property must ride on an action that has to happen
+> anyway.**
+
+The pattern is already in the tree three times and was not generalized:
+
+| mechanism | rides on | needs no watcher because |
+|---|---|---|
+| sidecar | one command, on demand | the hash matches or it does not |
+| `#guard_msgs` on `#print axioms` | **the Lean build** | a changed axiom set **breaks the build** |
+| double-entry (external precedent) | every transaction | the books do not balance |
+
+A property that cannot be attached to a mandatory action is a property
+that will need a watcher. **Those are the ones to identify early and
+decide about deliberately, not discover later.**
+
+### 10.3 · The six ambiguity classes, measured, with their carrier
+
+Each row: what goes wrong, how much of it exists now, and what mandatory
+action it could ride on. **The carrier column is the whole design.**
+
+| # | class | measured today | candidate carrier | preventable? |
+|---|---|---|---|---|
+| 1 | **orphan artifact** — a result with no record of the run | **53 of 151** results JSONs cited by no entry | the invocation layer (`run.py` already exists and writes manifests) | likely — if the producer writes provenance *into* the artifact, an orphan cannot exist |
+| 2 | **unstamped decision** — locked prereg, no verdict | **8 of 11** locked preregs have no verdict line | nothing automatic; a verdict is a human act | no — but self-evident on open. Unresolved: nobody re-opens 11 preregs |
+| 3 | **dangling reference** — a pointer to nothing | 5 known (4 × the documented-nonexistent Entry 18, 1 malformed token) | **the write** — a gate already runs on every Edit/Write | going forward, yes. The 5 historical ones are permanent |
+| 4 | **stale count** — a stated number that decayed | `CONTEXT.md` says "8 modules, 77 theorems, 77 pins"; actual **15 / 269 / 129** | **generation** — `THEOREMS.md` is generated and therefore cannot be stale | yes — a counted claim that is generated cannot rot |
+| 5 | **contradiction** — two statements of one fact, disagreeing | 1 confirmed (`BLUEPRINT:512` vs `FORMAT.md:59` vs ground truth); a detector for the general case **scored 14% precision** | single-source-of-truth: a fact has one home, everything else points at it | partly — prevention is a writing rule, not a mechanism |
+| 6 | **invisible retraction** — the original does not know it was corrected | 10 corrections; all 10 carry the target in `refs:`; **none of the 10 originals carries a marker** | nothing — and § 11 forbids editing the original | **no.** Genuine tension, see § 10.4 |
+
+**Four of six have a plausible carrier. Two do not.** That split is the
+most important thing on this page and it is what § 10.4 has to resolve
+before anything is built.
+
+### 10.4 · Questions that must be answered before any slice starts
+
+**Q1. Does the invocation layer already write provenance into the
+artifact, or only alongside it?** Class 1 depends entirely on this.
+`utilities/run.py` and its manifests exist and have not been read. If
+provenance is written into the results file, orphans are already
+preventable and 53 of them are historical debt. If only alongside, the
+carrier is weaker than it looks.
+
+**Q2. Can class 6 be solved at all without violating § 11?** A
+correction cannot mark its original without editing the original, which
+§ 11 forbids ("a correction folded into the original — new entry,
+visible"). Either the rule has an exception for a machine-written
+back-pointer, or class 6 is permanently detect-only, or the reader
+resolves it at read time by always walking forward. **This is a rule
+change and belongs to the operator.**
+
+**Q3. What is the acceptance test?** "Cannot be misread" needs a
+falsifiable form. Candidate: a cold reader given the corpus and a list
+of claims answers current/superseded/assumed for each, and is scored.
+Without an acceptance test this item has the same defect as item 9 —
+a description that changes shape and nothing to check it against.
+
+**Q4. Is a corpus descriptor required?** Detection or prevention both
+need to know what artifact types exist and what their formats are. A
+declared descriptor makes the corpus checkable and **is itself the
+standardization** the operator asked about. But it is a second file that
+can disagree with the tree. Alternative: formats are inferred, or the
+existing four format specs are made authoritative and machine-read.
+
+**Q5. What is permanent?** Historical ambiguity in an append-only record
+may be unfixable by construction. If so the deliverable splits in two:
+**prevention** going forward, and a **one-time filed census** of what is
+permanently ambiguous. Those are different products and should not be
+conflated.
+
+### 10.5 · Dependencies
+
+**S0 — corpus inventory. Nothing above this can be correct without it,
+and it does not exist.** What artifact types are present, what format
+each is in, which have a written spec, which have stable identifiers,
+what points at what. Four format specs exist (`notes/notes_format.md`,
+`preregs/FORMAT.md`, `papers/FORMAT.md`, `NOTEPAD_TEMPLATE.md`);
+coverage of the remaining types is **unknown**. Results JSONs and
+manifests have never been opened.
+
+Known file surface (measured): 199 JSON, 172 Python, 162 log, 59
+markdown, 53 Lean, 46 txt, 45 CSV, 11 sha256, 2 TOML; binary is 29 PNG,
+1 XLSX, 1 SVG. **~96% opens in any text editor with nothing installed.**
+The one portability cliff: Lean *reads* as text but *verifying* it needs
+a pinned toolchain and a multi-gigabyte build.
+
+### 10.6 · Reach — explicitly out of scope
+
+- a search interface, a UI, a ranked index
+- a graph renderer, typed edges, closure nodes (item 9; scored and
+  reduced in § 9.8)
+- **any modification to `Primebeat_081426`.** Operator's constraint,
+  2026-08-29: that tree is sensitive and unproven; scaffold in this
+  repository, read-only over that one, copies permitted
+- editing the historical record (§ 11)
+- a standing gate over the append-only record (§ 6.1: it can never be
+  silent when clean)
+
+### 10.7 · Slices, in dependency order
+
+Each is sized to one green build. **None may start before § 10.4.**
+
+- **S0 — inventory.** Artifact types, formats, spec coverage, identifier
+  stability, link kinds. Pure measurement, no design. Answers Q1 and Q4
+  as a side effect. *Blocks everything.*
+- **S1 — carrier audit.** For each of the six classes, confirm or refute
+  the candidate carrier in § 10.3 against the real tree. Output: the
+  table above, with the guesses replaced by findings.
+- **S2 — acceptance test.** Q3, made concrete and falsifiable, before
+  any mechanism is chosen.
+- **S3 — prevention, for classes with a confirmed carrier.** Build order
+  by carrier strength, not by class number.
+- **S4 — the permanence census.** One-time, filed as a record entry, for
+  what cannot be prevented retroactively. Not a gate.
+- **S5 — the classes with no carrier.** Only after Q2 is ruled on,
+  because it is a rule change.
+
+### 10.8 · What is known, and what is guessed
+
+**Measured:** all six counts in § 10.3; the file surface in § 10.5; the
+reader being a model (5,876 queries); the 14% precision of the
+contradiction detector.
+
+**Guessed, and marked as such:** every entry in the *carrier* column
+except `#guard_msgs`, which is observed working. `run.py` has not been
+read. Manifests have not been read. Whether classes 5 and 6 have any
+carrier at all is unknown, not merely unresolved.
