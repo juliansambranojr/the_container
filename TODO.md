@@ -1005,8 +1005,14 @@ both eras, and entries already name theorems and paths in prose where
   and prereg→sidecar from structured JSON and filename convention.
   *Green when:* every emitted edge resolves to a node from S1, and the
   count is stable across two runs.
-- **S3 — backlinks.** Falls out of S2 by inversion. No new extraction.
-  *Green when:* for any node, inbound + outbound are both listed.
+- **S3 — backlinks and query.**
+  builds: `map_query.py`
+  Backlinks fall out of S2 by inversion. The query surface takes a name
+  or a substring and returns the node, its conformance flags, and its
+  neighborhood — inbound and outbound. Independent of S4: it works on
+  the JSON whatever the render decision turns out to be.
+  *Green when:* for any node, inbound + outbound are both listed, and a
+  substring that names no node reports that rather than guessing.
 - **S4 — render.**
   builds: `map_render.py`
   **BLOCKED on an operator decision:** one file per node (~1,200 files,
