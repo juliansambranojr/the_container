@@ -6,12 +6,16 @@ independent and may proceed in any order or in parallel.
 
 ## Tier 0 — roots. Nothing depends on anything.
 
-- **[8] hook surface.** The container ships no `.claude/settings.json`,
+- **[8] hook surface.**
+  builds: `check_spec.py`, `settings.json`
+ The container ships no `.claude/settings.json`,
   so there is no interception layer at all. **This blocks every
   enforcement mechanism in the tree** — 7.8's interception, item 2's
   itch capture, item 6's ticker, and the spec-check hook. Root of the
   whole enforcement chain and currently a footnote.
-- **[5] pin-parity port.** Standalone, built, unwired. Needs only the
+- **[5] pin-parity port.**
+  builds: `check_pin_parity.py`
+ Standalone, built, unwired. Needs only the
   operator's ruling on restore-vs-amend.
 - **[1] glossary.** Drafted (6 entries). Needs only placement.
 
@@ -31,6 +35,7 @@ independent and may proceed in any order or in parallel.
 - **[6] itch ticker** ← needs 2 and at least two detectors; candidates
   are 5's parity check and 10's orphan class
 - **[9] MAP — build** ← needs 9's blueprint
+  builds: (undeclared — the blueprint names them)
 
 ## Tier 3
 
