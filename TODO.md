@@ -1041,6 +1041,17 @@ both eras, and entries already name theorems and paths in prose where
   *Constraint:* node ids are not legal filenames (`Paper.md § A3`,
   `results/x.json`). Files take a safe slug with the true id in
   frontmatter; every link must use the same slug or it dangles.
+- **S6 — zero-install viewer.**
+  builds: `map_html.py`
+  Markdown needs Obsidian or a Quartz build to give the search box and
+  the graph. A single self-contained HTML file — nodes and edges
+  embedded, vanilla JS, no CDN, no npm — gives all three to anyone with
+  a browser, offline, and can be committed, emailed or served from
+  Pages. Markdown stays the source; this is a second view of the same
+  data, not a second copy of the truth.
+  *Green when:* opens offline with no network, search finds a node by
+  name, clicking walks, and the local graph draws.
+
 - **S5 — conformance surfacing.** Non-conforming nodes render *as*
   non-conforming — "no summary", "uncited", "no verdict" — rather than
   being skipped. This is the self-evidence property: the gaps appear in
