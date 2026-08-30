@@ -660,9 +660,14 @@ and let that closure open as a node expanding to its history.
 **Two findings that shrink the estimate.**
 
 *The edges already exist, at full density.* The source program's record
-carries **227 entries and 227 `refs:` fields** — every entry declares
-its ancestry. The graph is complete and specified in plain text today.
-This is not a format change plus a backfill.
+carries **270 entries and 780 edges** — every entry declares its
+ancestry. The graph is complete and specified in plain text today. This
+is not a format change plus a backfill.
+
+> **Corrected 2026-08-29 (§ 9.4 measurement).** This paragraph first
+> read "227 entries and 227 `refs:` fields." That was volume 2 alone,
+> and it miscounted edges as one per entry. Both volumes carry 270
+> entries and 780 edges.
 
 *The generated-view pattern is already proven in the tree.*
 `utilities/theorem_index.py` states it in its own docstring —
@@ -679,12 +684,20 @@ an ancestry query on a DAG, not a visualization of the whole thing.
 Given a closure node, walk its edges back and stop:
 
 ```text
-hEF → 271 → 269 → 267 → 264 → 262 → 257 → 130
+Entry 271 ─┬─ 130   257   261   262   264   269   270      (direct refs)
+           └─ 267 arrives via 269 and 270, not directly
 ```
 
 That is cheap, it matches how the corpus is actually used (the operator
 refers to the object, not to the entry range), and it does not require
 the whole graph to be legible at once.
+
+> **Corrected 2026-08-29 (§ 9.4 measurement).** This illustration first
+> read `hEF → 271 → 269 → 267 → 264 → 262 → 257 → 130`, drawn as a
+> chain. It is a fan: 130, 257, 261, 262, 264, 269 and 270 are all
+> *direct* refs of 271, and 267 is not a ref of 271 at all. The
+> corrected shape matters, because a fan of seven is what makes the
+> transitive closure explode.
 
 ### 9.2 · The real work is edge typing
 
@@ -720,6 +733,52 @@ will probably not save it. No format change, no backfill, one script.
 earn their cost, and whether closure nodes are enumerated by hand or
 detected (an entry that discharges a leaf, ships a script, or pins a
 theorem is a candidate closure by its own content).
+
+### 9.4.1 · The slice was built and measured, 2026-08-29
+
+`the_container/utilities/ancestry.py` — stdlib only, read-only, not
+wired. Run over both notebook volumes.
+
+**Result: untyped ancestry is excellent for two levels and a hairball
+below them, and the cause is not missing types.**
+
+The measurement that settles it: **ancestry closure grows linearly with
+entry number.** Entry 40 → 15 ancestors. Entry 100 → 79. Entry 130 →
+109. Entry 271 → **167 distinct entries, 62% of the whole corpus.** No
+entry above 100 has an ancestry smaller than 79.
+
+**The cause is one habit.** 209 of 270 entries cite entry N−1. Median
+ref distance is 3; **52% of all 780 edges point within 3 entries.**
+*(Independently verified: 185 of 226 in volume 2 alone.)* So a large
+share of `refs:` is not "this stands on that" — it is "this is the next
+thing I did." A serial diary edge. Transitive closure over a
+chronological chain returns the prefix of the notebook, which is exactly
+what happened.
+
+**What this changes about § 9.2.** The four-way typing argued there is
+still right about correction-versus-citation, and the corpus confirms
+the collision — Entry 28's `refs: 29, 30, 31, 32` is a *forward scope*
+edge naming the entries it covers, which is why the graph has cycles at
+all. But the acute problem is a different and cheaper split:
+**builds-on versus came-after.** Typing that one distinction, even by
+hand over the ~209 N−1 edges, would collapse 271's ancestry toward its
+depth-2 view. Typing all four kinds *without* that split leaves the walk
+exactly as long.
+
+**The cheapest useful change is a depth bound, not typing.** `--depth 2`
+over the existing untyped edges produces readable views at zero backfill
+cost. The agent deliberately did not implement it — it is a scope
+decision. **OPERATOR — worth testing before any typing is priced.**
+
+**§ 9.5's audit case is already earning, on the first run.** The walk
+found five defects no gate catches: four entries (210, 211, 212, 215)
+citing **Entry 18, which does not exist** — the notebook's own header
+says so explicitly, "the gap is unexplained and has been recorded rather
+than filled" — plus one malformed refs token (`refs: 26 (vol 1), 111`,
+Entry 112). `check_refs.py` validates paper sections, Lean declarations,
+scripts and results paths; it **does not validate `refs:` between
+notebook entries at all.** Whatever is decided about typing, the defect
+scan is worth keeping.
 
 ### 9.5 · The map as an audit instrument, not only navigation
 
