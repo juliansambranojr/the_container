@@ -1,0 +1,6 @@
+# generated view — rebuild with:
+#   python3 ../utilities/map_nodes.py CORPUS > /tmp/n.json
+#   python3 ../utilities/map_edges.py CORPUS /tmp/n.json > /tmp/e.json
+#   python3 ../utilities/map_render.py /tmp/n.json /tmp/e.json --out map/
+*
+!.gitignore

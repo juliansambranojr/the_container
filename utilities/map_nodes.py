@@ -176,6 +176,14 @@ def preregs(root, nodes):
         nodes.append({"id": f"preregs/{f.name}", "kind": "prereg",
                       "file": f"preregs/{f.name}", "line": 1, "title": f.stem,
                       "flags": flags})
+        sc = d / f"{f.stem}.sha256"
+        if sc.exists():
+            # the sidecar is the lock authority (preregs/FORMAT.md:37), so it
+            # is a node in its own right, not an attribute of the prereg
+            nodes.append({"id": f"preregs/{sc.name}", "kind": "sidecar",
+                          "file": f"preregs/{sc.name}", "line": 1,
+                          "title": _text(sc).strip()[:16] or "empty",
+                          "flags": [] if _text(sc).strip() else ["empty"]})
 
 
 def manifests(root, nodes):
