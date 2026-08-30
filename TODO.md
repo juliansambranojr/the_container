@@ -11,8 +11,17 @@ and holds only work *not yet built*. When an item ships, it leaves here
 and enters the record as a dated entry; this file is never the authority
 on anything that exists.
 
-Items are numbered for citation. Open decisions are marked
-**OPERATOR** — the generator drafts, the operator decides.
+Items are numbered for citation. Open questions are marked **OPERATOR**
+— the generator drafts, the operator decides.
+
+**Every ruling the operator makes is marked `DECIDED <date>:` on its own
+line, so the whole set is one grep** — the operator answers a great many
+questions and the answers must be retrievable without knowing which item
+they landed in:
+
+```text
+grep -n '^\*\*DECIDED' TODO.md
+```
 
 ---
 
@@ -137,7 +146,8 @@ sits in § 9, the section about hash pre-images.
 
 ## 2 · The itch protocol — capture at friction, discharge at a boundary
 
-**Status:** open, unstarted. **Operator's framing, 2026-08-29.**
+**Status:** open, unstarted.
+**DECIDED 2026-08-29:** capture at friction, discharge at a boundary.
 
 **The observation.** A trap noticed mid-work is an itch. You can ignore
 it for a while, but eventually you have to scratch it — fix the thing —
@@ -190,7 +200,8 @@ session because the first bite was never written down.
 
 ## 3 · Trap graduation — the paid-once record is a pipeline, not a home
 
-**Status:** open, unstarted. **Operator's framing, 2026-08-29.**
+**Status:** open, unstarted.
+**DECIDED 2026-08-29:** each trap carries a disposition — inert, gate candidate, or workflow step.
 
 **The observation.** The trap ledger works, and it also accumulates
 things that should not stay prose. Some traps are inert facts (a lemma
@@ -222,7 +233,8 @@ it; it does not propose new adoption criteria.
 
 ## 4 · Workflow chart with dependencies — the loop as something that fires
 
-**Status:** open, unstarted. **Operator's framing, 2026-08-29.**
+**Status:** open, unstarted.
+**DECIDED 2026-08-29:** the loop becomes a dependency chart that fires, not prose that is read.
 
 **The ask.** A chart of stages with their dependencies, so that skills
 and checks fire at the stage that needs them and the generator executes
@@ -484,8 +496,7 @@ only the entry point moves.
 
 ### 7.7 · The skill is layer 3 and must stay thin
 
-**Operator's decision, 2026-08-29: the parser is invoked by a skill,
-triggered by the task.**
+**DECIDED 2026-08-29:** the parser is invoked by a skill, triggered by the task.
 
 **The constraint this inherits.** § 9 places assistant skills in layer 3
 — "forfeit on a swap; may point at layer 1, must never be its only
@@ -532,7 +543,8 @@ other, and the distinction is the whole design:
 
 ### 7.8 · Interception at the skill's first owned action
 
-**Operator's design, 2026-08-29.** The guard fires at the first action
+**DECIDED 2026-08-29:** the guard fires at the first action the skill owns.
+The guard fires at the first action
 the skill owns. If the skill's job includes writing an index line and
 the generator reaches for the index without having invoked the skill,
 the hook returns it to the skill. If the skill was already invoked, the
@@ -573,8 +585,7 @@ setup step — settings present, hook wired, flag path writable — so it
 needs the same liveness check, or a clone ships an interception that
 silently does not intercept.
 
-**No generator-invocable escape. The operator is the gate.**
-*Operator's decision, 2026-08-29.* An override the generator can invoke
+**DECIDED 2026-08-29:** no generator-invocable escape — the operator is the gate; a blocked write is parked, not refused. An override the generator can invoke
 is the generator adjudicating its own exception — the thing § 7 forbids
 by construction, and the concession finding directly beneath it says why
 it would not hold: given an override, a generator produces
@@ -598,8 +609,7 @@ nothing stops; authority is preserved because nothing lands unapproved.
 - § 7.8's interception now has a defined destination for what it
   catches, instead of a decision it cannot make.
 
-**The queue state is binary: open or closed.** *Operator's decision,
-2026-08-29.* While a staged write is **open** it is live, held in
+**DECIDED 2026-08-29:** the queue state is binary — open or closed. While a staged write is **open** it is live, held in
 scratch, and available; when the operator decides it is **closed**.
 This inherits NOTEPAD's existing status vocabulary rather than inventing
 a second word for a state the system already names, and it is cleaner
@@ -782,7 +792,8 @@ scan is worth keeping.
 
 ### 9.5 · The map as an audit instrument, not only navigation
 
-**Operator's framing, 2026-08-29.** Every edge from an open or closed
+**DECIDED 2026-08-29:** the map is an audit surface both parties read, not only navigation.
+Every edge from an open or closed
 node is traceable by both parties, so each can catch what the other
 missed. The value is not that the operator can find an entry; it is that
 **both look at the same surface instead of at two memories.**
@@ -811,7 +822,8 @@ suspect it before going to look.
 
 ### 9.6 · Link records, not filesystem symlinks
 
-**Engineering constraint.** The ask names symlinks to results,
+**DECIDED 2026-08-29:** link records — paths, SHAs, URLs in text — never filesystem symlinks.
+The ask names symlinks to results,
 references, web pages, and commits. Real filesystem symlinks are fragile
 in a tracked tree: they break across clones on some platforms, can point
 outside the repository, and some tooling mishandles them.
@@ -1015,10 +1027,20 @@ both eras, and entries already name theorems and paths in prose where
   substring that names no node reports that rather than guessing.
 - **S4 — render.**
   builds: `map_render.py`
-  **BLOCKED on an operator decision:** one file per node (~1,200 files,
-  buys a backlink panel and a free renderer in the Obsidian/Foam/Quartz
-  ecosystem) versus one generated file per node type (small, greps well,
-  outbound only).
+
+**DECIDED 2026-08-29:** S4 renders markdown, one file per node, with `[[wikilinks]]` and YAML frontmatter.
+ The operator asked from the outset for a search
+  bar, a mind map, and Google-Maps walking. That format is the one that
+  delivers all three through renderers that already exist — Obsidian
+  (offline desktop) and Quartz (static site, so a stranger installs
+  nothing). One file per node is not a preference: backlink panels and
+  graph views exist *because* each note is a node. One file per type
+  yields a table, not a map.
+  Source stays plain markdown, layer 1, portable. The renderer is layer
+  2 and disposable.
+  *Constraint:* node ids are not legal filenames (`Paper.md § A3`,
+  `results/x.json`). Files take a safe slug with the true id in
+  frontmatter; every link must use the same slug or it dangles.
 - **S5 — conformance surfacing.** Non-conforming nodes render *as*
   non-conforming — "no summary", "uncited", "no verdict" — rather than
   being skipped. This is the self-evidence property: the gaps appear in
@@ -1046,7 +1068,8 @@ modification to `Primebeat_081426` · a UI.
 
 ## 10 · BLUEPRINT — a corpus that cannot be misread
 
-**Status:** specified, unbuilt. Operator's framing 2026-08-29.
+**Status:** specified, unbuilt.
+**DECIDED 2026-08-29:** no detector layer — every integrity property rides on an action that must happen anyway.
 **Nothing here is built. No slice starts until § 10.4's questions are
 answered.**
 
