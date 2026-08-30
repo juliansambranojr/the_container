@@ -833,6 +833,96 @@ A closure node is a hub, not a text entry. Minimum contents:
 - open/closed state, inherited from the index rather than restated —
   **one authority per fact** (§ 9).
 
+### 9.8 · SCORED — adversarial audit, 2026-08-29. Four of this item's claims are falsified.
+
+A perturbation was spawned against § 9 with a mandate to measure rather
+than argue (BLUEPRINT § 7) and an explicit licence to kill the item.
+**Complete enumeration**, not a sample: 4 orchestrator and 191 subagent
+transcripts, 2026-08-14 → 2026-08-30, yielding **5,876 greps, 775 reads,
+2,102 operator messages**. Limits stated by the auditor: 8.5% of record
+queries unattributed, 216 grep targets unclassified, sessions outside
+this project id invisible.
+
+**Observed demand.** Of 968 record-navigation queries:
+
+| type | count | share |
+|---|---|---|
+| enumerate a file's headings (`grep '^#'`) | 310 | 32.0% |
+| multi-name alternation — "which doc mentions X\|Y\|Z" | 183 | 18.9% |
+| single identifier lookup | 90 | 9.3% |
+| verbatim phrase recall | 81 | 8.4% |
+| entry / date lookup | 56 | 5.8% |
+| **`refs:` / ancestry — what this item builds** | **10** | **1.0%** |
+
+Eight of those ten are from the session that built `ancestry.py`.
+**Organic ancestry demand over two weeks: 2 greps, 0.2%.** The
+circularity objection — nobody greps what nothing renders — was tested
+against 2,102 natural-language operator messages: 12 ancestry-shaped
+asks, 0.6%, the same order. And the *form* requested was a **written
+narrative** ("a brief logic chain of how we got to this point"), which a
+node-expanding DAG does not produce.
+
+The dominant retrieval act in the corpus is **orienting a stranger**:
+329 of 775 reads are the four commitment files. Already solved by four
+fixed filenames.
+
+**Four claims in this item are measurably false. Corrections, visible
+per § 11:**
+
+1. **§ 9.4.1's "serial diary edge" diagnosis is backwards.** It claimed
+   N−1 edges carry no information. Measured: N−1 edges are named in the
+   citing entry's prose **62.7%** of the time versus **47.5%** for
+   longer edges *(independently re-verified)*. They are the most
+   substantively discussed class, not the least.
+2. **§ 9.2's typing cost is priced wrong — the typing is already free.**
+   Filtering `refs:` to edges the entry's own prose names collapses
+   ancestry from median 94.5 to **median 4** (entry 271: 166 → 22). No
+   backfill, no format change, no hand-typing 209 edges. *Caveat the
+   auditor could not discharge: the collapse was measured, the precision
+   of what got dropped was not.*
+3. **§ 9.2's `corrects`-edge argument is falsified.** It called the
+   correction edge the one distinction only typing preserves. Measured:
+   10 explicit corrections, **10 of 10 already carry the target in
+   `refs:` with the retraction in prose beside it.** One regex extracts
+   them today.
+4. **§ 9.5's "linked claims that disagree" detector scores 14%.** The
+   auditor built it rather than reasoning about it: 605 candidate
+   groups, 14 fires, 2 touching the known ground-truth defect, ~12 false
+   positives. By § 6's standard, a gate that gets baselined into
+   inertness.
+
+**The need nothing serves — and it is not ancestry.** Of 30 zero-hit
+queries, **21 (70%) return results when re-run corpus-wide**: the
+content existed and the searcher aimed at the wrong file. Corroborated
+by the operator typing **"where is chain.md"** verbatim *(confirmed in
+transcript)* for a 1,634-line file grepped 36+ times; by **33 of 54**
+broken paths in agent briefs being notebook files addressed at the repo
+root instead of `notes/`; and by the operator's own 2026-08-21 framing —
+*"things written down in twenty million places… i need a solution that
+works in fidelity and not a patch."* Neither grep nor a graph fixes
+target selection.
+
+**What survived the auditor's attack on its own conclusion.** § 9.4.1's
+dangling-ref scan found five real defects on first run — four entries
+citing the documented-nonexistent Entry 18, plus a malformed token —
+and `check_refs.py` provably cannot find them (it validates entry
+numbering, types and NOTEPAD placement at lines 154–175 and never parses
+`refs:`). That is real and cheap. But it belongs as a **one-shot audit
+whose findings are filed**, not a standing gate: § 6.1's selection rule
+is that gates scanning the append-only record can never be silent when
+clean, and those four citations can never be repaired.
+
+**RECOMMENDATION — not a decision. OPERATOR to rule.** Reduce this item
+to three cheap pieces and drop the graph: (a) a corpus-wide full-text
+index plus a canonical placement rule, the only thing addressing the 70%
+of failures caused by aiming at the wrong file; (b) a generated
+heading/label index, since 32% of record queries are `grep '^#'`;
+(c) `ancestry.py` capped at `--depth 2` with the free prose-mention
+filter, run on demand, plus the dangling-ref scan as a filed one-shot.
+§ 9.2's four-way typing, § 9.6's link records and § 9.7's closure-node
+hub stay unbuilt until observed demand asks for them. Nothing in two
+weeks and 5,876 queries does.
+
 ---
 
 ## 10 · (next item)
