@@ -1,19 +1,16 @@
 #!/usr/bin/env python3
 """map_edges.py — S2 of the map (TODO § 11.4). Emit every gated edge.
 
-An edge is emitted only when BOTH endpoints are nodes S1 already found,
-and only for link kinds a gate already validates:
+DOMAIN-AGNOSTIC BY CONSTRUCTION. This file names no project, directory
+or subject. Which links exist, and how they are written, is declared in
+the corpus descriptor under `link_patterns` and `structured_links` —
+see `corpus.example.json`.
 
-    cite_paper     Paper.md § A3      check_refs validates existence
-    cite_lean      Namespace.decl     check_refs, by namespace and stem
-    cite_script    script.py          check_refs
-    cite_artifact  results/x.json     check_refs
-    cite_prereg    preregs/x.md       check_refs
-    cite_doc       CLAUDE.md § Name   check_refs
-    ran            manifest -> script         structured JSON
-    produced       manifest -> results        structured JSON
-    wrote          results -> script          structured JSON
-    locked_by      prereg -> sidecar          filename convention
+An edge is emitted only when BOTH endpoints are nodes S1 already found,
+so a pattern cannot invent a node. Two families:
+
+    declared patterns    a regex plus a target format, per link kind
+    structured links     read from JSON keys and filename convention
 
     refs           entry -> entry            check_entry_refs.py
 
