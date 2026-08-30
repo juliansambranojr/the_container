@@ -950,9 +950,17 @@ show a broken link, because the link fails the gate before it reaches
 the map. **This is what removes the need for a second thing to watch
 it.** The map inherits an existing guarantee instead of needing its own.
 
-**Excludes `refs:` by rule.** It is the one link type no gate validates
-and the one that measured broken. Admitting it would forfeit the
-inherited guarantee.
+**Excludes `refs:` until it is gated.** It is the one link type no gate
+validates and the one that measured broken. The rule is *only gated
+edges* — so the resolution is to build the missing gate, not to admit it
+ungated. `check_entry_refs.py` (S2) validates that every `refs:` target
+exists; once it does, `refs:` is admissible under the same rule that
+excluded it.
+
+> **Amended 2026-08-29**, after § 11.5's acceptance test failed on
+> "reach the entries that built it." Entry→entry lineage exists only in
+> `refs:`, so a blanket exclusion makes the test unpassable by
+> construction. Gating it is the resolution the rule already implies.
 
 ### 11.2 · Verified ground — measured 2026-08-29, not read from a spec
 
@@ -992,7 +1000,7 @@ both eras, and entries already name theorems and paths in prose where
   (missing `summary`, missing source line, no verdict, uncited).
   *Green when:* counts match § 11.2 exactly.
 - **S2 — edges.**
-  builds: `map_edges.py`
+  builds: `map_edges.py`, `check_entry_refs.py`
   Extract only the four gated token types, plus manifest→script→artifact
   and prereg→sidecar from structured JSON and filename convention.
   *Green when:* every emitted edge resolves to a node from S1, and the

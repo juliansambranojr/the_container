@@ -23,6 +23,7 @@ import argparse
 import json
 import pathlib
 import re
+import subprocess
 import sys
 
 SKIP_DIRS = {".git", ".lake", "__pycache__", "node_modules", ".venv"}
@@ -58,7 +59,8 @@ def entries(root, nodes):
             if not refs.strip():
                 flags.append("no_refs")
             nodes.append({"id": f"entry {num}", "kind": "entry",
-                          "file": vol, "title": title.strip(),
+                          "file": vol, "line": body[:m.start()].count("\n") + 1,
+                          "title": title.strip(),
                           "type": typ, "date": date, "flags": flags})
 
 
@@ -80,7 +82,9 @@ def lean(root, nodes):
             for tm in re.finditer(r"^theorem +([A-Za-z_][\w']*)", src, re.M):
                 name = tm.group(1)
                 nodes.append({"id": f"{ns}.{name}", "kind": "lean_decl",
-                              "file": f"{sub}/{f.name}", "title": name,
+                              "file": f"{sub}/{f.name}",
+                              "line": src[:tm.start()].count("\n") + 1,
+                              "title": name,
                               "flags": [] if name in pins else ["no_axiom_pin"]})
 
 
@@ -95,8 +99,9 @@ def papers(root, nodes):
         lines = t.split("\n")
         for m in re.finditer(r"^#{2,4} ([A-Z]\d*)\s*·\s*(.+)$", t, re.M):
             nodes.append({"id": f"{f.name} § {m.group(1)}", "kind": "paper_section",
-                          "file": f"papers/{f.name}", "title": m.group(2).strip(),
-                          "flags": []})
+                          "file": f"papers/{f.name}",
+                          "line": t[:m.start()].count("\n") + 1,
+                          "title": m.group(2).strip(), "flags": []})
         for i, line in enumerate(lines):
             sm = re.match(r"^\*\*([A-Z]\d+[′″‴]?)\.\*\*\s*(.*)", line)
             if not sm:
@@ -113,7 +118,7 @@ def papers(root, nodes):
                     has_src = True
                     break
             nodes.append({"id": f"{f.name} § {sm.group(1)}", "kind": "paper_statement",
-                          "file": f"papers/{f.name}",
+                          "file": f"papers/{f.name}", "line": i + 1,
                           "title": sm.group(2).strip()[:120],
                           "flags": [] if has_src else ["no_source_line"]})
 
@@ -123,13 +128,14 @@ def doc_sections(root, nodes):
         for m in re.finditer(r"^#{2,3} (.+)$", _text(f), re.M):
             nodes.append({"id": f"{f.name} § {m.group(1).strip()}",
                           "kind": "doc_section", "file": f.name,
+                          "line": _text(f)[:m.start()].count("\n") + 1,
                           "title": m.group(1).strip(), "flags": []})
 
 
 def scripts(root, nodes):
     for f in sorted(root.glob("*.py")):
         nodes.append({"id": f.name, "kind": "script", "file": f.name,
-                      "title": f.stem, "flags": []})
+                      "line": 1, "title": f.stem, "flags": []})
 
 
 def results(root, nodes, cited):
@@ -151,7 +157,7 @@ def results(root, nodes, cited):
         if rel not in cited:
             flags.append("uncited")
         nodes.append({"id": rel, "kind": "results", "file": rel,
-                      "title": f.stem, "flags": flags})
+                      "line": 1, "title": f.stem, "flags": flags})
 
 
 def preregs(root, nodes):
@@ -168,7 +174,7 @@ def preregs(root, nodes):
         elif not re.search(r"^-? *verdict: *\S", t, re.M):
             flags.append("locked_no_verdict")
         nodes.append({"id": f"preregs/{f.name}", "kind": "prereg",
-                      "file": f"preregs/{f.name}", "title": f.stem,
+                      "file": f"preregs/{f.name}", "line": 1, "title": f.stem,
                       "flags": flags})
 
 
@@ -178,7 +184,30 @@ def manifests(root, nodes):
         return
     for f in sorted(d.glob("*.json")):
         nodes.append({"id": f"results/runs/{f.name}", "kind": "manifest",
-                      "file": f"results/runs/{f.name}", "title": f.stem,
+                      "file": f"results/runs/{f.name}", "line": 1, "title": f.stem,
+                      "flags": []})
+
+
+def commits(root, nodes):
+    """A commit is a node only if git knows it. Git is the gate — a 7-hex
+    token in prose that no commit matches is not admitted."""
+    try:
+        log = subprocess.run(["git", "-C", str(root), "log",
+                              "--format=%h\t%ad\t%s", "--date=short"],
+                             capture_output=True, text=True, timeout=60)
+    except Exception:
+        return
+    if log.returncode != 0:
+        return
+    for line in log.stdout.strip().split("\n"):
+        if not line.strip():
+            continue
+        parts = line.split("\t", 2)
+        if len(parts) != 3:
+            continue
+        sha, date, subj = parts
+        nodes.append({"id": sha, "kind": "commit", "file": ".git",
+                      "line": 1, "title": subj[:120], "date": date,
                       "flags": []})
 
 
@@ -211,6 +240,7 @@ def main():
     results(root, nodes, cited_paths(root))
     preregs(root, nodes)
     manifests(root, nodes)
+    commits(root, nodes)
     nodes.sort(key=lambda n: (n["kind"], n["id"]))
 
     if not a.report:
