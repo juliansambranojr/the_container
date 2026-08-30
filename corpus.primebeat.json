@@ -1,0 +1,176 @@
+{
+  "_": [
+    "Descriptor for Primebeat_081426 — the test-case corpus.",
+    "This file, not the tools, is where that project's shape lives.",
+    "Point map_nodes.py at a different descriptor to map a different tree."
+  ],
+  "name": "Primebeat_081426",
+  "record": {
+    "volumes": [
+      {
+        "file": "notes/lab_notebook.md",
+        "id_min": 1,
+        "id_max": 44
+      },
+      {
+        "file": "notes/lab_notebook_2.md",
+        "id_min": 45,
+        "id_max": 999999
+      }
+    ],
+    "entry_re": "^## (\\d{4}-\\d\\d-\\d\\d) — Entry (\\d+) — (.*?)\\ntype: *(\\S+)\\nrefs: *(.*?)$",
+    "id_format": "entry {id}",
+    "field_type_group": 4,
+    "field_refs_group": 5,
+    "refs_are_ids": true,
+    "known_absent_ids": [
+      18
+    ]
+  },
+  "code": [
+    {
+      "kind": "lean_decl",
+      "dirs": [
+        "lean",
+        "lean_stage3/Stage3"
+      ],
+      "suffix": ".lean",
+      "namespace_re": "^namespace ([A-Za-z_][\\w'.]*)",
+      "decl_re": "^theorem +([A-Za-z_][\\w']*)",
+      "pin_re": "^#print axioms +([A-Za-z_][\\w'.]*)",
+      "pin_accepts_qualified": true,
+      "pin_flag": "no_axiom_pin"
+    }
+  ],
+  "documents": [
+    {
+      "kind": "paper_section",
+      "glob": "papers/*.md",
+      "exclude_basenames": [
+        "FORMAT.md"
+      ],
+      "label_re": "^#{2,4} ([A-Z]\\d*)\\s*·\\s*(.+)$",
+      "id_format": "{basename} § {label}"
+    },
+    {
+      "kind": "paper_statement",
+      "glob": "papers/*.md",
+      "exclude_basenames": [
+        "FORMAT.md"
+      ],
+      "label_re": "^\\*\\*([A-Z]\\d+[′″‴]?)\\.\\*\\*\\s*(.*)",
+      "id_format": "{basename} § {label}",
+      "requires_following_re": "^\\s*`",
+      "requires_stop_re": "^\\*\\*[A-Z]\\d+[′″‴]?\\.\\*\\*",
+      "requires_window": 30,
+      "missing_flag": "no_source_line"
+    },
+    {
+      "kind": "doc_section",
+      "glob": "*.md",
+      "label_re": "^#{2,3} (.+)$",
+      "id_format": "{basename} § {label}"
+    }
+  ],
+  "collections": [
+    {
+      "kind": "script",
+      "glob": "*.py",
+      "id_is_basename": true
+    },
+    {
+      "kind": "results",
+      "glob": "results/*.json",
+      "require_keys": [
+        "schema_version",
+        "script",
+        "summary"
+      ],
+      "uncited_flag": true
+    },
+    {
+      "kind": "prereg",
+      "glob": "preregs/*.md",
+      "exclude_basenames": [
+        "FORMAT.md"
+      ],
+      "lock_sibling_suffix": ".sha256",
+      "lock_sibling_kind": "sidecar",
+      "stamp_re": "^-? *verdict: *\\S",
+      "unstamped_flag": "locked_no_verdict",
+      "unlocked_flag": "no_sidecar_unlocked"
+    },
+    {
+      "kind": "manifest",
+      "glob": "results/runs/*.json"
+    }
+  ],
+  "commits": {
+    "enabled": true,
+    "short_len": 7
+  },
+  "link_patterns": [
+    {
+      "kind": "cite_paper",
+      "re": "([A-Za-z][\\w\\-.]*\\.md)`? § ([A-Z]\\d*)",
+      "target_format": "{1} § {2}"
+    },
+    {
+      "kind": "cite_doc",
+      "re": "([A-Za-z][\\w\\-.]*\\.md)`? § ([^\\n`§]{3,60})",
+      "target_format": "{1} § {2}",
+      "strip_target": true
+    },
+    {
+      "kind": "cite_lean",
+      "re": "(?<![\\w\\-/])([A-Z][\\w']*)\\.([a-z][\\w'_]*)",
+      "target_format": "{1}.{2}",
+      "require_namespace_group": 1
+    },
+    {
+      "kind": "cite_script",
+      "re": "(?<![\\w/])([\\w\\-]+\\.py)\\b",
+      "target_format": "{1}"
+    },
+    {
+      "kind": "cite_artifact",
+      "re": "(?<![\\w/.])(results/[\\w./\\-]+)",
+      "target_format": "{1}",
+      "rstrip_dots": true
+    },
+    {
+      "kind": "cite_prereg",
+      "re": "(?<![\\w/.])(preregs/[\\w./\\-]+\\.md)",
+      "target_format": "{1}"
+    }
+  ],
+  "structured_links": {
+    "_": "Machine-written links read from JSON and filename convention.",
+    "manifest_dir": "results/runs",
+    "manifest_script_key": "script",
+    "manifest_file_keys": [
+      "files_created",
+      "files_modified"
+    ],
+    "manifest_file_prefix": "results/",
+    "manifest_commit_key": "git_head",
+    "artifact_dir": "results",
+    "artifact_script_key": "script"
+  },
+  "scan": {
+    "suffixes": [
+      ".md",
+      ".lean"
+    ],
+    "skip_dirs": [
+      ".git",
+      ".lake",
+      "__pycache__",
+      "node_modules",
+      ".venv",
+      "archive",
+      "imported",
+      "files (2)"
+    ]
+  }
+}

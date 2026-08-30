@@ -41,9 +41,7 @@ import pathlib
 import re
 import sys
 
-SCAN_SUFFIX = {".md", ".lean"}
-SKIP_DIRS = {".git", ".lake", "__pycache__", "node_modules", ".venv",
-             "archive", "imported", "files (2)"}
+# No domain constants. Everything comes from the descriptor.
 
 
 def _text(p):
@@ -60,6 +58,16 @@ def _defence(t):
     def blank(m):
         return "\n" * m.group(0).count("\n")
     return re.sub(r"```.*?```", blank, t, flags=re.S)
+
+
+def _globs(root, spec):
+    pats = spec.get("glob")
+    pats = [pats] if isinstance(pats, str) else (pats or [])
+    out = []
+    for p in pats:
+        out.extend(sorted(root.glob(p)))
+    ex = set(spec.get("exclude_basenames") or [])
+    return [f for f in out if f.name not in ex]
 
 
 def owner_index(nodes):
@@ -83,20 +91,22 @@ def owner_of(idx, relfile, line):
     return ids[i] if i >= 0 else None
 
 
-def scan_citations(root, ids, idx, edges):
-    """The four gated token types, wherever they appear."""
-    lean_ns = {i.rsplit(".", 1)[0] for i in ids if "." in i}
+def scan_citations(root, d, ids, idx, edges):
+    """Every link pattern the descriptor declares. A pattern cannot invent a
+    node: an edge is emitted only when its target is already in `ids`."""
+    scan = d.get("scan") or {}
+    suffixes = set(scan.get("suffixes") or [".md"])
+    skip = set(scan.get("skip_dirs") or [])
+    pats = d.get("link_patterns") or []
+    ns_of = {i.rsplit(".", 1)[0] for i in ids if "." in i}
+
     for f in sorted(root.rglob("*")):
-        if not f.is_file() or f.suffix not in SCAN_SUFFIX:
+        if not f.is_file() or f.suffix not in suffixes:
             continue
-        if any(part in SKIP_DIRS for part in f.parts):
+        if any(part in skip for part in f.parts):
             continue
         rel = str(f.relative_to(root))
         text = _defence(_text(f))
-        starts = [0]
-        for ch in text:
-            pass
-        # precompute line index once
         line_of = []
         ln = 1
         for ch in text:
@@ -105,136 +115,153 @@ def scan_citations(root, ids, idx, edges):
                 ln += 1
         line_of.append(ln)
 
-        def emit(pos, target, kind):
-            src = owner_of(idx, rel, line_of[pos])
-            if src and target in ids and src != target:
-                edges.append({"from": src, "to": target, "kind": kind,
-                              "file": rel, "line": line_of[pos]})
+        for spec in pats:
+            fmt = spec.get("target_format", "{1}")
+            for m in re.finditer(spec["re"], text):
+                tgt = fmt
+                for gi in range(1, (m.lastindex or 0) + 1):
+                    tgt = tgt.replace("{%d}" % gi, m.group(gi) or "")
+                if spec.get("strip_target"):
+                    tgt = tgt.strip()
+                if spec.get("rstrip_dots"):
+                    tgt = tgt.rstrip(".")
+                # a namespaced code citation is only real if the namespace is
+                # one the corpus actually declares
+                if spec.get("require_namespace_group"):
+                    if m.group(spec["require_namespace_group"]) not in ns_of:
+                        continue
+                if tgt not in ids:
+                    continue
+                src = owner_of(idx, rel, line_of[m.start()])
+                if src and src != tgt:
+                    edges.append({"from": src, "to": tgt, "kind": spec["kind"],
+                                  "file": rel, "line": line_of[m.start()]})
 
-        for m in re.finditer(r"([A-Za-z][\w\-.]*\.md)`? § ([A-Z]\d*)", text):
-            emit(m.start(), f"{m.group(1)} § {m.group(2)}", "cite_paper")
-        for m in re.finditer(r"([A-Za-z][\w\-.]*\.md)`? § ([^\n`§]{3,60})", text):
-            emit(m.start(), f"{m.group(1)} § {m.group(2).strip()}", "cite_doc")
-        for m in re.finditer(r"(?<![\w\-/])([A-Z][\w']*)\.([a-z][\w'_]*)", text):
-            if m.group(1) in lean_ns:
-                emit(m.start(), f"{m.group(1)}.{m.group(2)}", "cite_lean")
-        for m in re.finditer(r"(?<![\w/])([\w\-]+\.py)\b", text):
-            emit(m.start(), m.group(1), "cite_script")
-        for m in re.finditer(r"(?<![\w/.])(results/[\w./\-]+)", text):
-            emit(m.start(), m.group(1).rstrip("."), "cite_artifact")
-        for m in re.finditer(r"(?<![\w/.])(preregs/[\w./\-]+\.md)", text):
-            emit(m.start(), m.group(1), "cite_prereg")
 
-
-def scan_refs(root, ids, edges):
-    """entry -> entry, gated by check_entry_refs.py."""
-    for vol, _lo, _hi in (("notes/lab_notebook.md", 1, 44),
-                          ("notes/lab_notebook_2.md", 45, 10 ** 6)):
-        f = root / vol
+def scan_refs(root, d, ids, edges):
+    """record -> record, gated by check_entry_refs.py."""
+    spec = d.get("record") or {}
+    if not spec.get("refs_are_ids"):
+        return
+    fmt = spec.get("id_format", "entry {id}")
+    gi = spec.get("field_refs_group", 5)
+    for vol in spec.get("volumes") or []:
+        f = root / vol["file"]
         if not f.exists():
             continue
         body = _defence(_text(f))
-        for m in re.finditer(r"^## \d{4}-\d\d-\d\d — Entry (\d+) — .*?\n"
-                             r"type: *\S+\nrefs: *(.*?)$", body, re.M):
-            src = f"entry {m.group(1)}"
+        for m in re.finditer(spec["entry_re"], body, re.M):
+            src = fmt.format(id=m.group(2))
+            if src not in ids:
+                continue
             if src not in ids:
                 continue
             line = body[:m.start()].count("\n") + 1
-            for tok in re.findall(r"\d+", m.group(2)):
-                tgt = f"entry {tok}"
+            for tok in re.findall(r"\d+", m.group(gi) or ""):
+                tgt = fmt.format(id=tok)
                 if tgt in ids and tgt != src:
                     edges.append({"from": src, "to": tgt, "kind": "refs",
-                                  "file": vol, "line": line})
+                                  "file": vol["file"], "line": line})
 
 
-def scan_commits(root, ids, idx, edges):
+def scan_commits(root, d, ids, idx, edges):
     """A short SHA in prose becomes an edge only if git knows the commit —
     the node set already carries only git-known commits, so membership in
     `ids` is the gate."""
+    scan = d.get("scan") or {}
+    skip = set(scan.get("skip_dirs") or [])
+    n = ((d.get("commits") or {}).get("short_len") or 7)
     for f in sorted(root.rglob("*.md")):
-        if any(part in SKIP_DIRS for part in f.parts):
+        if any(part in skip for part in f.parts):
             continue
         rel = str(f.relative_to(root))
         text = _defence(_text(f))
         ln = 1
-        for m in re.finditer(r"(?<![\w])([0-9a-f]{7})(?![\w])", text):
+        for m in re.finditer(r"(?<![\w])([0-9a-f]{%d})(?![\w])" % n, text):
             line = text[:m.start()].count("\n") + 1
             src = owner_of(idx, rel, line)
             if src and m.group(1) in ids:
                 edges.append({"from": src, "to": m.group(1), "kind": "at_commit",
                               "file": rel, "line": line})
-    d = root / "results" / "runs"
-    if d.is_dir():
-        for f in sorted(d.glob("*.json")):
+    st = d.get("structured_links") or {}
+    md = root / (st.get("manifest_dir") or "")
+    key = st.get("manifest_commit_key")
+    if key and md.is_dir():
+        for f in sorted(md.glob("*.json")):
             try:
                 o = json.loads(_text(f))
             except Exception:
                 continue
-            h = (o.get("git_head") or "")[:7]
-            if h in ids:
-                edges.append({"from": f"results/runs/{f.name}", "to": h,
-                              "kind": "at_commit",
-                              "file": f"results/runs/{f.name}", "line": 1})
+            h = (o.get(key) or "")[:n]
+            mid = st["manifest_dir"] + "/" + f.name
+            if h in ids and mid in ids:
+                edges.append({"from": mid, "to": h, "kind": "at_commit",
+                              "file": mid, "line": 1})
 
 
-def scan_structured(root, ids, edges):
-    """Machine-written links: manifests and the results envelope."""
-    d = root / "results" / "runs"
-    if d.is_dir():
-        for f in sorted(d.glob("*.json")):
-            mid = f"results/runs/{f.name}"
+def scan_structured(root, d, ids, edges):
+    """Machine-written links, declared in the descriptor."""
+    st = d.get("structured_links") or {}
+    md = root / (st.get("manifest_dir") or "")
+    if st.get("manifest_dir") and md.is_dir():
+        for f in sorted(md.glob("*.json")):
+            mid = st["manifest_dir"] + "/" + f.name
             try:
                 o = json.loads(_text(f))
             except Exception:
                 continue
-            sc = o.get("script")
+            sc = o.get(st.get("manifest_script_key") or "")
             if sc in ids:
                 edges.append({"from": mid, "to": sc, "kind": "ran",
                               "file": mid, "line": 1})
-            for grp in ("files_created", "files_modified"):
+            for grp in st.get("manifest_file_keys") or []:
                 for item in o.get(grp) or []:
-                    tgt = f"results/{item.get('path','')}"
+                    tgt = (st.get("manifest_file_prefix") or "") + item.get("path", "")
                     if tgt in ids:
-                        edges.append({"from": mid, "to": tgt,
-                                      "kind": "produced", "file": mid,
-                                      "line": 1})
-    rd = root / "results"
-    if rd.is_dir():
-        for f in sorted(rd.glob("*.json")):
+                        edges.append({"from": mid, "to": tgt, "kind": "produced",
+                                      "file": mid, "line": 1})
+    ad = root / (st.get("artifact_dir") or "")
+    akey = st.get("artifact_script_key")
+    if akey and st.get("artifact_dir") and ad.is_dir():
+        for f in sorted(ad.glob("*.json")):
             try:
                 o = json.loads(_text(f))
             except Exception:
                 continue
-            if isinstance(o, dict) and o.get("script") in ids:
-                edges.append({"from": f"results/{f.name}", "to": o["script"],
-                              "kind": "wrote", "file": f"results/{f.name}",
-                              "line": 1})
-    pd = root / "preregs"
-    if pd.is_dir():
-        for f in sorted(pd.glob("*.md")):
-            if (pd / f"{f.stem}.sha256").exists():
-                pid = f"preregs/{f.name}"
-                if pid in ids:
-                    edges.append({"from": pid, "to": f"preregs/{f.stem}.sha256",
-                                  "kind": "locked_by", "file": pid, "line": 1})
+            if isinstance(o, dict) and o.get(akey) in ids:
+                rel = st["artifact_dir"] + "/" + f.name
+                edges.append({"from": rel, "to": o[akey], "kind": "wrote",
+                              "file": rel, "line": 1})
+    for spec in d.get("collections") or []:
+        if not spec.get("lock_sibling_suffix"):
+            continue
+        for f in _globs(root, spec):
+            sib = f.with_suffix(spec["lock_sibling_suffix"])
+            if sib.exists():
+                a_, b_ = str(f.relative_to(root)), str(sib.relative_to(root))
+                if a_ in ids and b_ in ids:
+                    edges.append({"from": a_, "to": b_, "kind": "locked_by",
+                                  "file": a_, "line": 1})
 
 
 def main():
     ap = argparse.ArgumentParser(description="Emit every gated edge.")
     ap.add_argument("root")
+    ap.add_argument("descriptor")
     ap.add_argument("nodes", help="nodes.json from map_nodes.py")
     ap.add_argument("--report", action="store_true")
     a = ap.parse_args()
     root = pathlib.Path(a.root).resolve()
+    d = json.loads(pathlib.Path(a.descriptor).read_text())
     nodes = json.loads(pathlib.Path(a.nodes).read_text())["nodes"]
     ids = {n["id"] for n in nodes}
     idx = owner_index(nodes)
 
     edges = []
-    scan_citations(root, ids, idx, edges)
-    scan_refs(root, ids, edges)
-    scan_commits(root, ids, idx, edges)
-    scan_structured(root, ids, edges)
+    scan_citations(root, d, ids, idx, edges)
+    scan_refs(root, d, ids, edges)
+    scan_commits(root, d, ids, idx, edges)
+    scan_structured(root, d, ids, edges)
 
     seen, uniq = set(), []
     for e in edges:

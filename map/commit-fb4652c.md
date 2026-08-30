@@ -1,0 +1,16 @@
+---
+id: "fb4652c"
+kind: commit
+source: ".git"
+line: 1
+date: 2026-08-28
+conforming: true
+---
+
+# fb4652c
+
+K1_lt proved: finite-rectangle contour, (2/pi)*y^c, no limits
+
+`.git`
+
+*No gated links. This node is isolated in the map — which is itself a finding.*

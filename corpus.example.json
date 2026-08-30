@@ -1,0 +1,91 @@
+{
+  "_": [
+    "CORPUS DESCRIPTOR — declares the shape of a tree so the map tools can",
+    "read it without knowing anything about the domain. Copy this, edit the",
+    "globs and patterns to match your tree, and the map works on your",
+    "project. Nothing below mentions number theory, Lean, or any subject.",
+    "",
+    "Declaring the shape IS the standardization. A tool that has to be",
+    "edited per project is not agnostic; a tool that reads a declaration is.",
+    "",
+    "Every regex is Python `re`, matched multiline against the file with",
+    "fenced code blocks blanked. Capture groups are named in each section."
+  ],
+
+  "name": "example",
+
+  "record": {
+    "_": "The dated append-only log. Groups: 1=date 2=id 3=title. Optional volumes bound which ids may appear in which file.",
+    "volumes": [
+      { "file": "notes/log.md", "id_min": 1, "id_max": 999999 }
+    ],
+    "entry_re": "^## (\\d{4}-\\d\\d-\\d\\d) — Entry (\\d+) — (.*?)\\ntype: *(\\S+)\\nrefs: *(.*?)$",
+    "id_format": "entry {id}",
+    "field_type_group": 4,
+    "field_refs_group": 5,
+    "refs_are_ids": true,
+    "known_absent_ids": []
+  },
+
+  "code": [
+    {
+      "_": "Source carrying named declarations. `pin_re` is optional — omit it and no pin flag is produced.",
+      "kind": "declaration",
+      "dirs": ["src"],
+      "suffix": ".py",
+      "namespace_re": "^namespace ([A-Za-z_][\\w'.]*)",
+      "decl_re": "^def +([A-Za-z_][\\w']*)",
+      "pin_re": null,
+      "pin_flag": "no_pin"
+    }
+  ],
+
+  "documents": [
+    {
+      "_": "Sectioned prose. Each label becomes an addressable node.",
+      "kind": "doc_section",
+      "glob": "*.md",
+      "label_re": "^#{2,3} (.+)$",
+      "id_format": "{file} § {label}"
+    }
+  ],
+
+  "collections": [
+    {
+      "_": "A set of files that are nodes by path. require_keys applies to JSON only and raises a conformance flag when absent.",
+      "kind": "artifact",
+      "glob": "out/*.json",
+      "require_keys": ["schema_version"],
+      "uncited_flag": true
+    },
+    {
+      "kind": "protocol",
+      "glob": "protocols/*.md",
+      "exclude_basenames": ["FORMAT.md"],
+      "lock_sibling_suffix": ".sha256",
+      "lock_sibling_kind": "lock",
+      "stamp_re": "^-? *verdict: *\\S",
+      "unstamped_flag": "locked_no_verdict"
+    }
+  ],
+
+  "commits": {
+    "_": "Commits become nodes only if git knows them — git is the gate. Set to false for a tree without git.",
+    "enabled": true,
+    "short_len": 7
+  },
+
+  "link_patterns": [
+    {
+      "_": "The gated edge grammar. A link is emitted only when its target is already a node, so a pattern cannot invent one.",
+      "kind": "cite_doc",
+      "re": "([A-Za-z][\\w\\-.]*\\.md)`? § ([^\\n`§]{3,60})",
+      "target_format": "{1} § {2}"
+    },
+    {
+      "kind": "cite_artifact",
+      "re": "(?<![\\w/.])(out/[\\w./\\-]+)",
+      "target_format": "{1}"
+    }
+  ]
+}
